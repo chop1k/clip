@@ -1,0 +1,19 @@
+{
+  "name": "chop1k/CliP",
+  "description": "Package for working with console and console arguments.",
+  "minimum-stability": "dev",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "chop1k",
+      "email": "fakeshopendesu@gmail.com"
+    }
+  ],
+  "require": {
+  },
+  "autoload": {
+    "psr-4": {
+      "CliP\\": "src/"
+    }
+  }
+}
