@@ -1,8 +1,11 @@
 {
-  "name": "chop1k/CliP",
+  "name": "clip/clip",
   "description": "Package for working with console and console arguments.",
+  "type": "library",
+  "keywords": ["console", "cli", "framework", "package", "tools"],
   "minimum-stability": "dev",
   "license": "MIT",
+  "version": "1.0.0-dev",
   "authors": [
     {
       "name": "chop1k",
@@ -10,6 +13,7 @@
     }
   ],
   "require": {
+    "php": "^7.4"
   },
   "autoload": {
     "psr-4": {
