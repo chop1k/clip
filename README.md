@@ -1,4 +1,4 @@
-# Cli Package (CliP)
+# Consolly Package
 Package for working with console
 
 ## Requirements
