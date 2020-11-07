@@ -1,13 +1,13 @@
 <?php
 
-namespace CliP\Exception;
+namespace Consolly\Exception;
 
 use Exception;
 
 /**
  * Class CommandNotFoundException represents exception, which throws when command is not found.
  *
- * @package CliP\Exception
+ * @package Consolly\Exception
  */
 class CommandNotFoundException extends Exception
 {

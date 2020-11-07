@@ -1,11 +1,11 @@
 <?php
 
-namespace CliP\Option;
+namespace Consolly\Option;
 
 /**
  * Class Option represents option abstract class
  *
- * @package CliP\Option
+ * @package Consolly\Option
  */
 abstract class Option
 {

@@ -1,11 +1,11 @@
 <?php
 
-namespace CliP\Command;
+namespace Consolly\Command;
 
 /**
  * Class Command represents command abstract class
  *
- * @package CliP\Command
+ * @package Consolly\Command
  */
 abstract class Command
 {
@@ -17,7 +17,7 @@ abstract class Command
     public abstract function getName(): string;
 
     /**
-     * Returns array of command options, each option must be CliP\Option\Option instance.
+     * Returns array of command options, each option must be Consolly\Option\Option instance.
      *
      * @return array
      */
@@ -27,7 +27,7 @@ abstract class Command
      * User-defined function, which will be executed when command invoked.
      *
      * @param array $nextArgs
-     * Command line arguments which come after command. Each argument is instance of CliP\Console\Argument class
+     * Command line arguments which come after command. Each argument is instance of Consolly\Console\Argument class
      */
     public abstract function handle(array $nextArgs): void;
 }

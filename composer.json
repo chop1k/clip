@@ -1,5 +1,5 @@
 {
-  "name": "clip/clip",
+  "name": "consolly/consolly",
   "description": "Package for working with console and console arguments.",
   "type": "library",
   "keywords": ["console", "cli", "framework", "package", "tools"],
@@ -17,7 +17,7 @@
   },
   "autoload": {
     "psr-4": {
-      "CliP\\": "src/"
+      "Consolly\\": "src/"
     }
   }
 }

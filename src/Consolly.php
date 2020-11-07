@@ -1,20 +1,20 @@
 <?php
 
-namespace CliP;
+namespace Consolly;
 
-use CliP\Command\Command;
-use CliP\Console\Argument;
-use CliP\Exception\CommandNotFoundException;
-use CliP\Exception\OptionRequiredException;
-use CliP\Exception\OptionRequiresValueException;
-use CliP\Option\Option;
+use Consolly\Command\Command;
+use Consolly\Console\Argument;
+use Consolly\Exception\CommandNotFoundException;
+use Consolly\Exception\OptionRequiredException;
+use Consolly\Exception\OptionRequiresValueException;
+use Consolly\Option\Option;
 
 /**
- * Class CliP contains main functional for working with CliP architecture.
+ * Class Consolly contains main functional for working with Consolly architecture.
  *
- * @package CliP
+ * @package Consolly
  */
-class CliP
+class Consolly
 {
     /**
      * Contains array of commands.
@@ -59,7 +59,7 @@ class CliP
      * Handles given arguments and invokes command found.
      *
      * @param array $args
-     * Array of strings or CliP\Console\Argument instances.
+     * Array of strings or Consolly\Console\Argument instances.
      *
      * @throws CommandNotFoundException
      * Throws when command not found and default command not specified.
@@ -100,10 +100,10 @@ class CliP
      * Array of command line arguments.
      *
      * @return array
-     * Array wherein first element is command index, second element CliP\Command\Command instance.
+     * Array wherein first element is command index, second element Consolly\Command\Command instance.
      *
      * @throws CommandNotFoundException
-     * If command not found it throws CliP\Exception\CommandNotFoundException which will be caught.
+     * If command not found it throws Consolly\Exception\CommandNotFoundException which will be caught.
      */
     private function getCommand(array $args): array
     {

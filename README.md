@@ -6,16 +6,16 @@ Package for working with console
 
 ## How to use
 ```php
-$clip = new \CliP\CliP();
+$cons = new \Consolly\Consolly();
 
-$clip->addCommand(new MyCommand1());
-$clip->addCommand(new MyCommand2());
-$clip->addCommand(new MyCommand3());
+$cons->addCommand(new MyCommand1());
+$cons->addCommand(new MyCommand2());
+$cons->addCommand(new MyCommand3());
 
 // add your commands...
 
-$clip->setDefaultCommand(new MyDefaultCommand());
+$cons->setDefaultCommand(new MyDefaultCommand());
 
-$clip->handle($argv);
+$cons->handle($argv);
 
 ```

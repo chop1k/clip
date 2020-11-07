@@ -1,11 +1,11 @@
 <?php
 
-namespace CliP\Console;
+namespace Consolly\Console;
 
 /**
  * Class Argument represents console argument
  *
- * @package CliP\Console
+ * @package Consolly\Console
  */
 class Argument
 {
