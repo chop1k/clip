@@ -2,9 +2,10 @@
 
 namespace Consolly;
 
+use Consolly\Argument\Argument;
 use Consolly\Command\Command;
-use Consolly\Console\Argument;
 use Consolly\Exception\CommandNotFoundException;
+use Consolly\Exception\NameConflictException;
 use Consolly\Exception\OptionRequiredException;
 use Consolly\Exception\OptionRequiresValueException;
 use Consolly\Option\Option;
@@ -55,244 +56,178 @@ class Consolly
         $this->defaultCommand = null;
     }
 
-    /**
-     * Handles given arguments and invokes command found.
-     *
-     * @param array $args
-     * Array of strings or Consolly\Console\Argument instances.
-     *
-     * @throws CommandNotFoundException
-     * Throws when command not found and default command not specified.
-     *
-     * @throws OptionRequiredException
-     * Throws when required option isn't specified.
-     *
-     * @throws OptionRequiresValueException
-     * Throws when option requires value, but it's not specified.
-     */
     public function handle(array $args): void
     {
-        $args = Argument::getArguments($args);
+        array_walk($args, function (&$item) {
+            $item = Argument::parse($item);
+        });
 
-        $i = 0;
+        [$i, $command] = $this->getCommand($args);
 
-        $command = null;
-
-        try {
-            [$i, $command] = $this->getCommand($args);
-        } catch (CommandNotFoundException $exception) {
+        if (is_null($command))
+        {
             if (is_null($this->defaultCommand))
             {
-                throw $exception;
+                throw new CommandNotFoundException('Command not found');
             }
 
-            $i = count($args);
             $command = $this->defaultCommand;
         }
 
         $this->handleCommand($command, array_slice($args, 0, $i), array_slice($args, $i));
     }
 
-    /**
-     * Find command in given array and returns command and command index.
-     *
-     * @param array $args
-     * Array of command line arguments.
-     *
-     * @return array
-     * Array wherein first element is command index, second element Consolly\Command\Command instance.
-     *
-     * @throws CommandNotFoundException
-     * If command not found it throws Consolly\Exception\CommandNotFoundException which will be caught.
-     */
     private function getCommand(array $args): array
     {
-        $i = 0;
-
-        /**
-         * @var Argument $arg
-         */
-        foreach ($args as $arg)
+        for ($i = 0; $i < count($args); $i++)
         {
-            $i++;
+            /**
+             * @var Argument $arg
+             */
+            $arg = $args[$i];
 
-            if ($arg->isCommand())
+            if ($arg->getType() === Argument::Command)
             {
-                if (!isset($this->commands[$arg->getName()]))
-                {
-                    continue;
-                }
-
-                return [
-                    $i,
-                    $this->commands[$arg->getName()]
-                ];
+                return [$i, $this->commands[$arg->getValue()]];
             }
-
         }
 
-        throw new CommandNotFoundException('Command not found');
+        return [0, null];
     }
 
-    /**
-     * Handles given options.
-     *
-     * @param array $args
-     * Array of options, received from given args.
-     *
-     * @param array $values
-     * Array of values, received from given args.
-     *
-     * @param array $options
-     * Options, which defined in command.
-     *
-     * @throws OptionRequiredException
-     * Throws when required option isn't specified.
-     *
-     * @throws OptionRequiresValueException
-     * Throws when option requires value, but it's not specified.
-     */
-    private function handleOptions(array $args, array $values, array $options): void
+    private function handleOptions(array $args, array $options): int
     {
-        $valuePointer = 0;
+        $handledRequiredOptions = 0;
+
+        $argsCount = count($args);
+
+        for ($i = 0; $i < $argsCount; $i++)
+        {
+            /**
+             * @var Argument $arg
+             */
+            $arg = $args[$i];
+
+            if ($arg->getType() > 200 || $arg->getType() < 100)
+            {
+                continue;
+            }
+
+            $name = $arg->getName();
+
+            if ($arg->isAbbreviated() && strlen($name) > 1)
+            {
+                $abbreviations = Argument::toAbbreviations($name, true);
+
+                $valuePointer = 0;
+
+                for ($o = 0; $o < count($abbreviations); $o++)
+                {
+                    $option = $this->getOption($options, $abbreviations[$o]);
+
+                    if (is_null($option))
+                    {
+                        continue;
+                    }
+
+                    $index = $i+$valuePointer+1;
+
+                    $nextArg = ($index > $argsCount) ? $args[$index] : null;
+
+                    $this->handleOption($option, $nextArg);
+
+                    if ($option->isRequiresValue())
+                    {
+                        $valuePointer++;
+                    }
+                }
+            }
+            else
+            {
+                $option = $this->getOption($options, $arg->getArg());
+
+                $index = $i+1;
+
+                $this->handleOption($option, ($index > $argsCount) ? $args[$index] : null);
+            }
+        }
+
+        return $handledRequiredOptions;
+    }
+
+    private function getOption(array $options, string $option): ?Option
+    {
+        return isset($options[$option]) ? $options[$option] : null;
+    }
+
+    private function handleOption(Option $option, ?Argument $nextArg): void
+    {
+        if ($option->isRequiresValue())
+        {
+            if (is_null($nextArg))
+            {
+                throw new OptionRequiresValueException("Value for option '{$option->getName()}' not found. Value must be in '' or \"\"");
+            }
+
+            if ($nextArg->getType() >= 300 || $nextArg->getType() < 200)
+            {
+                throw new OptionRequiresValueException("Value for option '{$option->getName()}' not found. Value must be in '' or \"\"");
+            }
+
+            $option->setValue($nextArg->getValue());
+        }
+
+        $option->setIndicated(true);
+    }
+
+    private function getOptions(Command $command): array
+    {
+        $options = [];
+
+        $requiredOptions = 0;
 
         /**
          * @var Option $option
          */
-        foreach ($options as $option)
+        foreach ($command->getOptions() as $option)
         {
             $name = "--{$option->getName()}";
 
-            /**
-             * @var Argument|null $arg
-             */
-            $arg = null;
-
-            if (isset($args[$name]))
+            if (isset($options[$name]))
             {
-                $arg = $args[$name];
+                throw new NameConflictException(sprintf('Option with name "%s" already defined', $name));
             }
 
-            $abbreviation = $option->getAbbreviation();
+            $options[$name] = $option;
 
-            if (!is_null($abbreviation))
+            $abbreviation = "-{$option->getAbbreviation()}";
+
+            if (isset($options[$abbreviation]))
             {
-                $abbreviation = "-$abbreviation";
-
-                if (isset($args[$abbreviation]))
-                {
-                    $arg = $args[$abbreviation];
-                }
+                throw new NameConflictException(sprintf('Option with name "%s" already defined', $abbreviation));
             }
 
-            if (is_null($arg))
+            $options[$abbreviation] = $option;
+
+            if ($option->isRequired())
             {
-                if ($option->isRequired())
-                {
-                    throw new OptionRequiredException(sprintf('Option with name "%s" is required', $option->getName()));
-                }
-
-                $option->setIndicated(false);
-
-                continue;
+                $requiredOptions++;
             }
-
-            if ($option->isRequiresValue())
-            {
-                if ($valuePointer+1 > count($values))
-                {
-                    throw new OptionRequiresValueException(sprintf('Value for option "%s" not found. Value must be in \'\' or "".', $option->getName()));
-                }
-
-                /**
-                 * @var Argument $value
-                 */
-                $value = $values[$valuePointer];
-
-                $option->setValue(trim($value->getArg(), "'\""));
-
-                $valuePointer++;
-            }
-
-            $option->setIndicated(true);
-        }
-    }
-
-    /**
-     * Handles abbreviated parameters.
-     *
-     * @param array $rawArgs
-     * Array of options, received from args.
-     *
-     * @return array
-     * Returns the same array, but with multiple-abbreviated option converted to normal state.
-     *
-     * For example: option like -aTgP will be converted to array [-a, -T, -g, -P] and merged with other options.
-     */
-    private function handleAbbreviations(array $rawArgs): array
-    {
-        $args = [];
-
-        /**
-         * @var Argument $rawArg
-         */
-        foreach ($rawArgs as $rawArg)
-        {
-            if (!$rawArg->isAbbreviations())
-            {
-                $args[$rawArg->getArg()] = $rawArg;
-
-                continue;
-            }
-
-            $abbreviations = $rawArg->getAbbreviations();
-
-            array_walk($abbreviations, function (&$item) {
-                $item = "-$item";
-            });
-
-            $abbreviationsAsArgs = array_values($abbreviations);
-
-            $position = $rawArg->getPosition();
-
-            array_walk($abbreviationsAsArgs, function (&$item, $key, &$position) {
-                $item = new Argument($item);
-
-                if (!is_null($position))
-                {
-                    $item->setPosition($position);
-
-                    $position++;
-                }
-            }, $position);
-
-            $args = array_merge($args, array_combine($abbreviations, $abbreviationsAsArgs));
         }
 
-        return $args;
+        return [$requiredOptions, $options];
     }
 
-    /**
-     * Handles command options and executes command handler.
-     *
-     * @param Command $command
-     * Command instance.
-     *
-     * @param array $args
-     * All arguments preceding the command.
-     *
-     * @param array $nextArgs
-     * All arguments following the command.
-     *
-     * @throws OptionRequiredException
-     * Throws when required option isn't specified.
-     *
-     * @throws OptionRequiresValueException
-     * Throws when option requires value, but it's not specified.
-     */
     private function handleCommand(Command $command, array $args, array $nextArgs): void
     {
-        $this->handleOptions($this->handleAbbreviations(Argument::getOptions($args)), Argument::getValues($args), $command->getOptions());
+        [$requiredOptions, $options] = $this->getOptions($command);
+
+        $handledRequiredOptions = $this->handleOptions($args, $options);
+
+        if ($requiredOptions !== $handledRequiredOptions)
+        {
+            throw new OptionRequiredException("Number of required options ($requiredOptions) and number of handled required options ($handledRequiredOptions) are not match.");
+        }
 
         $command->handle($nextArgs);
     }
