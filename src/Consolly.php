@@ -128,30 +128,7 @@ class Consolly
 
                 for ($o = 0; $o < count($abbreviations); $o++)
                 {
-                    $option = $this->getOption($options, $abbreviations[$o]);
-
-                    if (is_null($option))
-                    {
-                        continue;
-                    }
-
-                    $index = $i+$valuePointer+1;
-
-                    $nextArg = ($index <= $argsCount) ? $args[$index] : null;
-
-                    $this->handleOption($option, $nextArg);
-
-                    if ($option->isRequiresValue())
-                    {
-                        $valuePointer++;
-                    }
-
-                    if ($option->isRequired())
-                    {
-                        $handledRequiredOptions++;
-                    }
-
-                    [$required, $requiredValue] = $this->processOption($args, $options, $abbreviations[$o], $i+$valuePointer+1, $argsCount);
+                    [$required, $requiredValue] = $this->processOption($args, $options, $abbreviations[$o], $i + $valuePointer + 1, $argsCount);
 
                     if ($requiredValue)
                     {
@@ -228,7 +205,7 @@ class Consolly
          */
         foreach ($command->getOptions() as $option)
         {
-            $name = "--{$option->getName()}";
+            $name = Argument::toOption($option->getName());
 
             if (isset($options[$name]))
             {
@@ -237,7 +214,7 @@ class Consolly
 
             $options[$name] = $option;
 
-            $abbreviation = "-{$option->getAbbreviation()}";
+            $abbreviation = Argument::toAbbreviation($option->getAbbreviation());
 
             if (isset($options[$abbreviation]))
             {
