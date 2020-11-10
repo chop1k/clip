@@ -56,8 +56,13 @@ class Consolly
         $this->defaultCommand = null;
     }
 
-    public function handle(array $args): void
+    public function handle(array $args, $ignoreFirst = true): void
     {
+        if ($ignoreFirst)
+        {
+            array_shift($args);
+        }
+
         array_walk($args, function (&$item) {
             $item = Argument::parse($item);
         });
@@ -132,7 +137,7 @@ class Consolly
 
                     $index = $i+$valuePointer+1;
 
-                    $nextArg = ($index > $argsCount) ? $args[$index] : null;
+                    $nextArg = ($index <= $argsCount) ? $args[$index] : null;
 
                     $this->handleOption($option, $nextArg);
 
@@ -140,19 +145,51 @@ class Consolly
                     {
                         $valuePointer++;
                     }
+
+                    if ($option->isRequired())
+                    {
+                        $handledRequiredOptions++;
+                    }
+
+                    [$required, $requiredValue] = $this->processOption($args, $options, $abbreviations[$o], $i+$valuePointer+1, $argsCount);
+
+                    if ($requiredValue)
+                    {
+                        $valuePointer++;
+                    }
+
+                    if ($required)
+                    {
+                        $handledRequiredOptions++;
+                    }
                 }
             }
             else
             {
-                $option = $this->getOption($options, $arg->getArg());
+                [$required] = $this->processOption($args, $options, $arg->getArg(), $i+1, $argsCount);
 
-                $index = $i+1;
-
-                $this->handleOption($option, ($index > $argsCount) ? $args[$index] : null);
+                if ($required)
+                {
+                    $handledRequiredOptions++;
+                }
             }
         }
 
         return $handledRequiredOptions;
+    }
+
+    private function processOption(array $args, array $options, string $option, int $index, int $argsCount): array
+    {
+        $option = $this->getOption($options, $option);
+
+        if (is_null($option))
+        {
+            return [false, false];
+        }
+
+        $this->handleOption($option, ($index <= $argsCount) ? $args[$index] : null);
+
+        return [$option->isRequired(), $option->isRequiresValue()];
     }
 
     private function getOption(array $options, string $option): ?Option
@@ -171,7 +208,7 @@ class Consolly
 
             if ($nextArg->getType() >= 300 || $nextArg->getType() < 200)
             {
-                throw new OptionRequiresValueException("Value for option '{$option->getName()}' not found. Value must be in '' or \"\"");
+                throw new OptionRequiresValueException("Value for option '{$option->getName()}' not found. Next value '$nextArg'");
             }
 
             $option->setValue($nextArg->getValue());
