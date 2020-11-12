@@ -79,7 +79,7 @@ class Consolly
             $command = $this->defaultCommand;
         }
 
-        $this->handleCommand($command, array_slice($args, 0, $i), array_slice($args, $i));
+        $this->handleCommand($command, array_slice($args, 0, $i), array_slice($args, $i+1));
     }
 
     private function getCommand(array $args): array
@@ -164,7 +164,7 @@ class Consolly
             return [false, false];
         }
 
-        $this->handleOption($option, ($index <= $argsCount) ? $args[$index] : null);
+        $this->handleOption($option, ($index < $argsCount) ? $args[$index] : null);
 
         return [$option->isRequired(), $option->isRequiresValue()];
     }
