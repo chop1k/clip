@@ -3,7 +3,7 @@
   "description": "Package for working with console and console arguments.",
   "type": "library",
   "keywords": ["console", "cli", "framework", "package", "tools"],
-  "minimum-stability": "dev",
+  "minimum-stability": "stable",
   "license": "MIT",
   "version": "1.0.0",
   "authors": [
@@ -14,7 +14,7 @@
   ],
   "require": {
     "php": "^7.4",
-    "consolly/argument": "dev-master"
+    "consolly/argument": "1.0.0"
   },
   "autoload": {
     "psr-4": {
