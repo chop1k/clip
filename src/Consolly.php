@@ -77,7 +77,7 @@ class Consolly
      * @throws OptionRequiresValueException
      * Throws when option requires value and value not specified
      */
-    public function handle(array $args, $ignoreFirst = true): void
+    public function handle(array $args, bool $ignoreFirst = true): void
     {
         if ($ignoreFirst)
         {
@@ -279,7 +279,7 @@ class Consolly
 
             if ($nextArg->getType() >= 300 || $nextArg->getType() < 200)
             {
-                throw new OptionRequiresValueException("Value for option '{$option->getName()}' not found. Next value '$nextArg'");
+                throw new OptionRequiresValueException("Value for option '{$option->getName()}' not found. Next value '{$nextArg->build()}'");
             }
 
             $option->setValue($nextArg->getValue());
