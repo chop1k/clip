@@ -13,12 +13,20 @@
     }
   ],
   "require": {
-    "php": "^7.4",
-    "consolly/argument": "1.0.0"
+    "php": "^7.4"
+  },
+  "require-dev": {
+    "squizlabs/php_codesniffer": "3.5.8",
+    "phpunit/phpunit": "9.3.8"
   },
   "autoload": {
     "psr-4": {
       "Consolly\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Consolly\\Tests\\": "tests/"
     }
   }
 }

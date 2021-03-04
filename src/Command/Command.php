@@ -3,31 +3,50 @@
 namespace Consolly\Command;
 
 /**
- * Class Command represents command abstract class
+ * Class Command represents helpful implementation of the {@link CommandInterface}.
+ *
+ * WARNING: You must define values for every variable of this class because it have no default value.
+ * Otherwise when trying to access the variable, an exception will be thrown because the variable is not initialized.
+ * For example, you can define values for the variables in the constructor.
  *
  * @package Consolly\Command
  */
-abstract class Command
+class Command implements CommandInterface
 {
     /**
-     * Returns command name.
+     * Contains name of the command.
      *
-     * @return string
+     * @var string $name
      */
-    public abstract function getName(): string;
+    protected string $name;
 
     /**
-     * Returns array of command options, each option must be Consolly\Option\Option instance.
+     * Contains an array of options.
      *
-     * @return array
+     * @var array $options
      */
-    public abstract function getOptions(): array;
+    protected array $options;
 
     /**
-     * User-defined function, which will be executed when command invoked.
-     *
-     * @param array $nextArgs
-     * Command line arguments which come after command. Each argument is instance of Consolly\Console\Argument class
+     * @inheritdoc
      */
-    public abstract function handle(array $nextArgs): void;
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getOptions(): array
+    {
+        return $this->options;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function handle(array $nextArgs)
+    {
+    }
 }

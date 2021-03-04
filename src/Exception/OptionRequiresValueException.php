@@ -9,5 +9,4 @@ namespace Consolly\Exception;
  */
 class OptionRequiresValueException extends OptionException
 {
-
 }

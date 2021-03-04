@@ -3,55 +3,163 @@
 namespace Consolly\Option;
 
 /**
- * Class Option represents option abstract class
+ * Class Option represents helpful implementation of the {@link OptionInterface}.
+ *
+ * WARNING: You must define values for every variable of this class because it have no default value.
+ * Otherwise when trying to access the variable, an exception will be thrown because the variable is not initialized.
+ * For example, you can define values for the variables in the constructor.
  *
  * @package Consolly\Option
  */
-abstract class Option
+class Option implements OptionInterface
 {
     /**
-     * Returns option full name.
-     * It must not starts with "-" or "--", otherwise option will be ignored or an exception will be thrown.
+     * Contains a name of the option.
      *
-     * @return string
+     * @var string $name
      */
-    public abstract function getName(): string;
+    protected string $name;
 
     /**
-     * Returns abbreviation of option name.
-     * It must not starts with "-", "--" and must contain only one symbol, otherwise option will be ignored or an exception will be thrown.
+     * Contains an abbreviation of the option.
      *
-     * @return string|null
+     * @var string|null $abbreviation
      */
-    public abstract function getAbbreviation(): ?string;
+    protected ?string $abbreviation;
 
     /**
-     * Must return true if option requires value, false otherwise.
+     * Contains bool which indicates whether option requires a value.
+     *
+     * @var bool $requiresValue
+     */
+    protected bool $requiresValue;
+
+    /**
+     * Contains a value of the option.
+     *
+     * @var mixed $value
+     */
+    protected $value;
+
+    /**
+     * Contains bool which indicates whether option required.
+     *
+     * @var bool $required
+     */
+    protected bool $required;
+
+    /**
+     * Contains bool which indicates whether option specified.
+     *
+     * @var bool $indicated
+     */
+    protected bool $indicated;
+
+    /**
+     * @inheritdoc
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Sets a name of the option.
+     *
+     * @param string $name
+     */
+    public function setName(string $name): void
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getAbbreviation(): ?string
+    {
+        return $this->abbreviation;
+    }
+
+    /**
+     * Sets an abbreviation of the option.
+     *
+     * @param string|null $abbreviation
+     */
+    public function setAbbreviation(?string $abbreviation): void
+    {
+        $this->abbreviation = $abbreviation;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isRequiresValue(): bool
+    {
+        return $this->requiresValue;
+    }
+
+    /**
+     * Sets a requiresValue of the option.
+     *
+     * @param bool $requiresValue
+     */
+    public function setRequiresValue(bool $requiresValue): void
+    {
+        $this->requiresValue = $requiresValue;
+    }
+
+    /**
+     * Returns a value of the option.
+     *
+     * @return mixed
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setValue($value): void
+    {
+        $this->value = $value;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isRequired(): bool
+    {
+        return $this->required;
+    }
+
+    /**
+     * Sets whether the option required or not.
+     *
+     * @param bool $required
+     */
+    public function setRequired(bool $required): void
+    {
+        $this->required = $required;
+    }
+
+    /**
+     * Returns true if option was indicated.
      *
      * @return bool
      */
-    public abstract function isRequiresValue(): bool;
+    public function isIndicated(): bool
+    {
+        return $this->indicated;
+    }
 
     /**
-     * Will be executed if option value found.
-     *
-     * @param string $value
-     * Option value.
+     * @inheritdoc
      */
-    public abstract function setValue(string $value): void;
-
-    /**
-     * Returns true if option is required, false otherwise.
-     * If option required and not defined in console arguments it will throw exception.
-     *
-     * @return bool
-     */
-    public abstract function isRequired(): bool;
-
-    /**
-     * Will be executed with true parameter if option contains in console arguments, otherwise with false parameter.
-     *
-     * @param bool $value
-     */
-    public abstract function setIndicated(bool $value): void;
+    public function setIndicated(bool $value): void
+    {
+        $this->indicated = $value;
+    }
 }
