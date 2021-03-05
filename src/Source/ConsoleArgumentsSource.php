@@ -17,11 +17,18 @@ class ConsoleArgumentsSource implements SourceInterface
     protected array $arguments;
 
     /**
+     * If true, it ignores first arguments of $arguments.
+     *
+     * @var bool $ignoreFirst
+     */
+    protected bool $ignoreFirst;
+
+    /**
      * @inheritdoc
      */
     public function getArguments(): array
     {
-        return $this->arguments;
+        return ($this->ignoreFirst) ? array_shift($this->arguments) : $this->arguments;
     }
 
     /**
@@ -35,6 +42,26 @@ class ConsoleArgumentsSource implements SourceInterface
     }
 
     /**
+     * Returns true if first argument ignored.
+     *
+     * @return bool
+     */
+    public function isIgnoreFirst(): bool
+    {
+        return $this->ignoreFirst;
+    }
+
+    /**
+     * Sets whether first argument should be ignored.
+     *
+     * @param bool $ignoreFirst
+     */
+    public function setIgnoreFirst(bool $ignoreFirst): void
+    {
+        $this->ignoreFirst = $ignoreFirst;
+    }
+
+    /**
      * ConsoleArgumentsSource constructor.
      *
      * @param array $arguments
@@ -45,6 +72,7 @@ class ConsoleArgumentsSource implements SourceInterface
      */
     public function __construct(array $arguments, bool $ignoreFirst = true)
     {
-        $this->arguments = ($ignoreFirst) ? array_shift($arguments) : $arguments;
+        $this->arguments = $arguments;
+        $this->ignoreFirst = $ignoreFirst;
     }
 }

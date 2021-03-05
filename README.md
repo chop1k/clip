@@ -5,7 +5,10 @@ Package for console scripts and applications.
 - PHP 7.4
 
 ## Documentation
-Will be added later
+- [Basic usage](docs/basic_usage.md)
+- [Source](docs/source.md)
+- [Distributor](docs/distributor.md)
+- [Changelog](docs/changelog.md)
 
 ## What can you do using Consolly?
 

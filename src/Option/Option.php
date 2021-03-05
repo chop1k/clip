@@ -5,8 +5,8 @@ namespace Consolly\Option;
 /**
  * Class Option represents helpful implementation of the {@link OptionInterface}.
  *
- * WARNING: You must define values for every variable of this class because it have no default value.
- * Otherwise when trying to access the variable, an exception will be thrown because the variable is not initialized.
+ * WARNING: You must define values for every variable of this class because it has no default value.
+ * Otherwise, when trying to access the variable, an exception will be thrown because the variable is not initialized.
  * For example, you can define values for the variables in the constructor.
  *
  * @package Consolly\Option
