@@ -28,7 +28,11 @@ class ConsoleArgumentsSource implements SourceInterface
      */
     public function getArguments(): array
     {
-        return ($this->ignoreFirst) ? array_shift($this->arguments) : $this->arguments;
+        if ($this->ignoreFirst) {
+            array_shift($this->arguments);
+        }
+
+        return $this->arguments;
     }
 
     /**
