@@ -43,7 +43,7 @@ class Distributor implements DistributorInterface
      */
     public function __construct()
     {
-        $this->commandPosition = -1;
+        $this->commandPosition = 0;
     }
 
     /**
@@ -305,32 +305,6 @@ class Distributor implements DistributorInterface
      */
     public function getNextArguments(): array
     {
-        if ($this->commandPosition === -1) {
-            $commandMethodName = 'getCommand()';
-            $className = Distributor::class;
-            $commandPosition = '$commandPosition';
-            $nextArgumentsMethod = 'getNextArguments()';
-
-            throw new LogicException(
-                sprintf(
-                    'Command position is -1. ' .
-                    'This exception should not be thrown because the %s method of the "%s" class ' .
-                    'sets %s to another value. This is only possible if you extend the "%s" class ' .
-                    'by overriding the %s method and leaving the default value of the %s variable. ' .
-                    'To fix this you should set the %s variable in the %s method or override the %s method. ',
-                    $commandMethodName,
-                    $className,
-                    $commandPosition,
-                    $className,
-                    $commandMethodName,
-                    $commandPosition,
-                    $commandPosition,
-                    $commandMethodName,
-                    $nextArgumentsMethod
-                )
-            );
-        }
-
         return array_slice($this->arguments, $this->commandPosition + 1);
     }
 }

@@ -152,6 +152,7 @@ class Consolly
         $this->defaultCommand = $defaultCommand;
         $this->source = $source;
         $this->distributor = $distributor;
+        $this->commands = [];
     }
 
     /**
