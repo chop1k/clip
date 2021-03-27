@@ -5,7 +5,7 @@
   "keywords": ["console", "cli", "framework", "package", "tools"],
   "minimum-stability": "stable",
   "license": "MIT",
-  "version": "v2.0.0",
+  "version": "v2.0.1",
   "authors": [
     {
       "name": "chop1k",
