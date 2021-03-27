@@ -29,12 +29,25 @@ class ConsollyTest extends TestCase
             [
                 [
                     'unknown-command'
-                ], new DefaultTestCommand()
+                ], new DefaultTestCommand(), true
+            ],
+            [
+                [
+                    'unknown-command'
+                ], new DefaultTestCommand(), false
             ],
             [
                 [
                     ''
-                ], null
+                ], null, false
+            ],
+            [
+                [
+                ], new TestCommand(), false
+            ],
+            [
+                [
+                ], new TestCommand(), true
             ]
         ];
     }
@@ -48,9 +61,11 @@ class ConsollyTest extends TestCase
      *
      * @param CommandInterface|null $defaultCommand
      *
+     * @param bool $addCommand
+     *
      * @throws CommandNotFoundException
      */
-    public function testDefaultCommand(array $arguments, ?CommandInterface $defaultCommand): void
+    public function testDefaultCommand(array $arguments, ?CommandInterface $defaultCommand, bool $addCommand): void
     {
         if (is_null($defaultCommand)) {
             $this->expectException(CommandNotFoundException::class);
@@ -62,7 +77,9 @@ class ConsollyTest extends TestCase
             $defaultCommand
         );
 
-        $consolly->addCommand(new TestCommand());
+        if ($addCommand) {
+            $consolly->addCommand(new TestCommand());
+        }
 
         self::assertTrue($consolly->handle());
     }
