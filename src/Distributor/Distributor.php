@@ -5,10 +5,10 @@ namespace Consolly\Distributor;
 use Consolly\Command\CommandInterface;
 use Consolly\Exception\OptionRequiredException;
 use Consolly\Exception\OptionRequiresValueException;
+use Consolly\Formatter\FormatterInterface;
 use Consolly\Helper\Argument;
 use Consolly\Option\OptionInterface;
 use InvalidArgumentException;
-use LogicException;
 
 /**
  * Class Distributor represents default implementation of the {@link DistributorInterface}.
@@ -39,11 +39,21 @@ class Distributor implements DistributorInterface
     protected int $commandPosition;
 
     /**
-     * Distributor constructor.
+     * Contains a formatter instance.
+     *
+     * @var FormatterInterface $formatter
      */
-    public function __construct()
+    protected FormatterInterface $formatter;
+
+    /**
+     * Distributor constructor.
+     *
+     * @param FormatterInterface $formatter
+     */
+    public function __construct(FormatterInterface $formatter)
     {
         $this->commandPosition = 0;
+        $this->formatter = $formatter;
     }
 
     /**
@@ -99,29 +109,13 @@ class Distributor implements DistributorInterface
                 );
             }
 
-            if (!Argument::isCommand($argument)) {
+            if (!isset($this->commands[$argument])) {
                 continue;
             }
 
             $this->commandPosition = $i;
 
-            if (!isset($this->commands[$argument])) {
-                continue;
-            }
-
-            $command = $this->commands[$argument];
-
-            if (is_null($command)) {
-                throw new InvalidArgumentException(
-                    sprintf(
-                        'Commands array contains "%s" key, but the value is null, implementation of "%s" needed.',
-                        $argument,
-                        CommandInterface::class
-                    )
-                );
-            }
-
-            return $command;
+            return $this->commands[$argument];
         }
 
         return null;
@@ -136,7 +130,23 @@ class Distributor implements DistributorInterface
      *
      * @throws OptionRequiresValueException
      */
-    public function handleOptions(CommandInterface $command): void
+    public function handleArguments(CommandInterface $command): void
+    {
+        [$commandOptions, $requiredOptionsNumber] = $this->sortOptions($command);
+
+        [$options, $values] = $this->sortArguments();
+
+        $this->handle($options, $values, $commandOptions, $requiredOptionsNumber);
+    }
+
+    /**
+     * Sorts command options and returns indexed array of options.
+     *
+     * @param CommandInterface $command
+     *
+     * @return array
+     */
+    protected function sortOptions(CommandInterface $command): array
     {
         $commandOptions = [];
         $requiredOptionsNumber = 0;
@@ -145,13 +155,15 @@ class Distributor implements DistributorInterface
          * @var OptionInterface $option
          */
         foreach ($command->getOptions() as $option) {
-            $name = sprintf('--%s', trim($option->getName(), "\"'- "));
+            $name = $this->formatter->format($option->getName(), Argument::TYPE_OPTION);
 
             $commandOptions[$name] = $option;
 
-            $abbreviation = sprintf('-%s', trim($option->getAbbreviation(), "\"'- "));
+            $abbreviation = $option->getAbbreviation();
 
-            if ($abbreviation != false) {
+            if ($abbreviation !== null) {
+                $abbreviation = $this->formatter->format($abbreviation, Argument::TYPE_ABBREVIATION);
+
                 $commandOptions[$abbreviation] = $option;
             }
 
@@ -160,17 +172,105 @@ class Distributor implements DistributorInterface
             }
         }
 
+        return [
+            $commandOptions,
+            $requiredOptionsNumber
+        ];
+    }
+
+    /**
+     * Sorts arguments and returns array with arrays of options and values.
+     *
+     * @return array[]
+     */
+    protected function sortArguments(): array
+    {
         $options = [];
         $values = [];
 
-        foreach ($this->arguments as $argument) {
-            if (Argument::isOption($argument)) {
-                $this->handleOption($options, $values, $argument);
-            } elseif (Argument::isValue($argument)) {
-                $this->handleValue($options, $values, $argument);
+        $handle = function ($argument, string $type) use (&$options, &$values) {
+            if ($type === Argument::TYPE_OPTION || $type === Argument::TYPE_ABBREVIATION) {
+                $options[] = $argument;
+            } elseif ($type === Argument::TYPE_VALUE || $type === Argument::TYPE_PURE_VALUE) {
+                $values[] = $argument;
+            }
+        };
+
+        for ($i = 0; $i < count($this->arguments); $i++) {
+            if ($i >= $this->commandPosition) {
+                break;
+            }
+
+            $argument = $this->arguments[$i];
+
+            $type = $this->formatter->parse($argument);
+
+            if (
+                $type === Argument::TYPE_EQUAL_SEPARATED_OPTION ||
+                $type === Argument::TYPE_EQUAL_SEPARATED_ABBREVIATIONS
+            ) {
+                $this->handleEqualSeparated($argument, $handle);
+            } else {
+                $handle($argument, $type);
             }
         }
 
+        return [
+            $options, $values
+        ];
+    }
+
+    /**
+     * Explodes equal-separated argument and executes callback with basic types.
+     *
+     * @param $argument
+     *
+     * @param callable $handler
+     * Handler callback for handling basic types like option, abbreviated option and values.
+     * Takes value and type.
+     */
+    protected function handleEqualSeparated($argument, callable $handler): void
+    {
+        [$option, $value] = Argument::explodeEqualSeparated($argument);
+
+        $type = $this->formatter->parse($option);
+
+        if ($type === Argument::TYPE_ABBREVIATIONS) {
+            $options = str_split(Argument::clear($option));
+        } else {
+            $options = [$option];
+        }
+
+        foreach ($options as $char) {
+            $handler(
+                $this->formatter->format($char, Argument::TYPE_ABBREVIATION),
+                Argument::TYPE_ABBREVIATION
+            );
+
+            $handler(
+                $this->formatter->format($value, Argument::TYPE_PURE_VALUE),
+                Argument::TYPE_PURE_VALUE
+            );
+        }
+    }
+
+    /**
+     * Distributes given options and values.
+     *
+     * @param array $options
+     *
+     * @param array $values
+     *
+     * @param array $commandOptions
+     *
+     * @param int $requiredOptionsNumber
+     *
+     * @throws OptionRequiredException
+     *
+     * @throws OptionRequiresValueException
+     */
+    protected function handle(array $options, array $values, array $commandOptions, int $requiredOptionsNumber): void
+    {
         $pointer = 0;
         $requiredOptionsProcessed = 0;
 
@@ -185,20 +285,10 @@ class Distributor implements DistributorInterface
 
             if ($option->isRequiresValue()) {
                 if (!isset($values[$pointer])) {
-                    throw new OptionRequiresValueException(
-                        sprintf(
-                            'Cannot find a value for the option "%s". ' .
-                            'Expected value index is "%s" while array values count is "%s". ',
-                            $option->getName(),
-                            $pointer,
-                            count($values)
-                        )
-                    );
+                    throw OptionRequiresValueException::cannotFindValue($option->getName(), $pointer, count($values));
                 }
 
-                $option->setValue(
-                    trim($values[$pointer], '\'" ')
-                );
+                $option->setValue($this->formatter->format($values[$pointer], Argument::TYPE_PURE_VALUE));
 
                 $pointer++;
             }
@@ -209,94 +299,7 @@ class Distributor implements DistributorInterface
         }
 
         if ($requiredOptionsNumber !== $requiredOptionsProcessed) {
-            throw new OptionRequiredException(
-                sprintf(
-                    'The number of required options (%s) and ' .
-                    'the number of processed required options (%s) is not equal.',
-                    $requiredOptionsNumber,
-                    $requiredOptionsProcessed
-                )
-            );
-        }
-    }
-
-    /**
-     * Handles the argument as option.
-     *
-     * @param array $options
-     *
-     * @param array $values
-     *
-     * @param string $argument
-     */
-    protected function handleOption(array &$options, array &$values, string $argument): void
-    {
-        if (Argument::isAbbreviations($argument)) {
-            $this->handleAbbreviatedOptions($options, $values, $argument);
-        } else {
-            if (Argument::isEqualSeparatedOption($argument)) {
-                $this->handleEqualSeparated($options, $values, $argument);
-            } else {
-                $options[] = $argument;
-            }
-        }
-    }
-
-    /**
-     * Handles the argument as an array of abbreviated options.
-     *
-     * @param array $options
-     *
-     * @param array $values
-     *
-     * @param string $argument
-     */
-    protected function handleAbbreviatedOptions(array &$options, array &$values, string $argument): void
-    {
-        if (Argument::isEqualSeparatedOption($argument)) {
-            $this->handleEqualSeparated($options, $values, $argument);
-        } else {
-            foreach (str_split(trim($argument, '-')) as $item) {
-                $options[] = sprintf('-%s', $item);
-            }
-        }
-    }
-
-    /**
-     * Handles the argument as a value.
-     *
-     * @param array $options
-     *
-     * @param array $values
-     *
-     * @param string $argument
-     */
-    protected function handleValue(array &$options, array &$values, string $argument): void
-    {
-        $values[] = $argument;
-    }
-
-    /**
-     * Handles the argument as an equal separated option.
-     *
-     * @param array $options
-     *
-     * @param array $values
-     *
-     * @param string $argument
-     */
-    protected function handleEqualSeparated(array &$options, array &$values, string $argument): void
-    {
-        [$option, $value] = Argument::explodeEqualSeparatedOption($argument);
-
-        if (Argument::isAbbreviations($option)) {
-            foreach (str_split(trim($option, '-')) as $item) {
-                $options[] = sprintf('-%s', $item);
-                $values[] = $value;
-            }
-        } else {
-            $options[] = $option;
-            $values[] = $value;
+            throw OptionRequiredException::optionRequired($requiredOptionsNumber, $requiredOptionsProcessed);
         }
     }
 
