@@ -8,6 +8,8 @@ Package for console scripts and applications.
 - [Basic usage](docs/basic_usage.md)
 - [Source](docs/source.md)
 - [Distributor](docs/distributor.md)
+- [Formatter](docs/formatter.md)
+- [Argument](docs/argument.md)
 - [Changelog](docs/changelog.md)
 
 ## What can you do using Consolly?

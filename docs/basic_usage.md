@@ -1,6 +1,6 @@
 # Basic usage
-For use consolly you should create a commands, and an options for the commands.
-Alter that you should add your options to the command, create consolly class, add command to main Consolly class and execute the handle() method of the consolly class.
+For use consolly you should create commands and options for the commands.
+Alter that you should add your options to the command, create Consolly instance, add command to the Consolly class and execute the handle() method of the consolly instance.
 
 ## Commands
 All commands must implement CommandInterface or extend Command class.
@@ -77,7 +77,7 @@ CommandInterface defines methods:
 - handle() - Method which will be executed if the command specified.
 
 ## Options
-Option is string like "-o" "--option" which are in front of the command. Option can require value and be required, can be equal separated and abbreviated.
+Option is string like "-o" or "--option" which are in front of the command. Option can require value and be required, can be equal separated and abbreviated.
 All options must implement OptionInterface interface.
 
 ### Creating option via Option class
@@ -171,20 +171,24 @@ If no command found, consolly will use the default command. If no default comman
 
 Default command - the command, which will be used if the command was not found by the distributor.
 
-After that, consolly will execute handleOptions() method of the distributor.
-Distributor will handle an options, after that consolly will pass a result of the getNextArguments() method of the distributor to the handle() method of the command.
+After that, consolly will execute handleArguments() method of the distributor.
+Distributor will handle an arguments, after that consolly will pass a result of the getNextArguments() method of the distributor to the handle() method of the command.
 In the end, consolly will return a result of the handle() method of the command.
 
 ```php
 use Consolly\Consolly;
 use Consolly\Distributor\Distributor;
+use Consolly\Formatter\Formatter;
 use Consolly\Source\ConsoleArgumentsSource;
 
 $consolly = new Consolly(
     new ConsoleArgumentsSource([]), // default source
-    new Distributor(), // default distributor
+    new Distributor(new Formatter()), // default distributor with default formatter
     new MyDefaultCommand()
 );
+
+// Or you can use preset.
+$consolly = Consolly::default([], new MyDefaultClass());
 
 // you also can use accessors to set default command.
 
@@ -199,8 +203,6 @@ This way, you can create nested commands.
 ```php
 use Consolly\Command\Command;
 use Consolly\Consolly;
-use Consolly\Distributor\Distributor;
-use Consolly\Source\ConsoleArgumentsSource;
 
 class MyCommand extends Command
 {
@@ -213,10 +215,7 @@ class MyCommand extends Command
     
     public function handle(array $nextArgs)
     {
-        $consolly = new Consolly(
-            new ConsoleArgumentsSource($nextArgs, false),
-            new Distributor()
-        );
+        $consolly = Consolly::default($nextArgs);
         
         $consolly->addCommand(new MyNestedCommand());
         $consolly->addCommand(new AlsoMyNestedCommand());
