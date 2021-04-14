@@ -6,6 +6,7 @@ use Consolly\Command\CommandInterface;
 use Consolly\Consolly;
 use Consolly\Distributor\Distributor;
 use Consolly\Exception\CommandNotFoundException;
+use Consolly\Formatter\Formatter;
 use Consolly\Source\ConsoleArgumentsSource;
 use Consolly\Tests\Command\DefaultTestCommand;
 use Consolly\Tests\Command\TestCommand;
@@ -72,8 +73,8 @@ class ConsollyTest extends TestCase
         }
 
         $consolly = new Consolly(
-            new ConsoleArgumentsSource($arguments, false),
-            new Distributor(),
+            new ConsoleArgumentsSource($arguments),
+            new Distributor(new Formatter()),
             $defaultCommand
         );
 
