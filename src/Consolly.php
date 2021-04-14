@@ -3,8 +3,11 @@
 namespace Consolly;
 
 use Consolly\Command\CommandInterface;
+use Consolly\Distributor\Distributor;
 use Consolly\Distributor\DistributorInterface;
 use Consolly\Exception\CommandNotFoundException;
+use Consolly\Formatter\Formatter;
+use Consolly\Source\ConsoleArgumentsSource;
 use Consolly\Source\SourceInterface;
 
 /**
@@ -184,10 +187,28 @@ class Consolly
             $command = $this->defaultCommand;
         }
 
-        $this->distributor->handleOptions($command);
+        $this->distributor->handleArguments($command);
 
         return $command->handle(
             $this->distributor->getNextArguments()
+        );
+    }
+
+    /**
+     * Shortcut for creating default preset.
+     *
+     * @param array $argv
+     *
+     * @param CommandInterface|null $defaultCommand
+     *
+     * @return static
+     */
+    public static function default(array $argv, ?CommandInterface $defaultCommand = null): self
+    {
+        return new Consolly(
+            new ConsoleArgumentsSource($argv),
+            new Distributor(new Formatter()),
+            $defaultCommand
         );
     }
 }
