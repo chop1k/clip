@@ -7,6 +7,8 @@ use Consolly\Distributor\Distributor;
 use Consolly\Distributor\DistributorInterface;
 use Consolly\Exception\OptionRequiredException;
 use Consolly\Exception\OptionRequiresValueException;
+use Consolly\Formatter\Formatter;
+use Consolly\Helper\Argument;
 use Consolly\Tests\Command\TestCommand;
 use PHPUnit\Framework\TestCase;
 
@@ -46,7 +48,21 @@ class DistributorTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->distributor = new Distributor();
+        $this->distributor = new Distributor(new Formatter());
+    }
+
+    /**
+     * Without quotes it will throw an Exception because command name and value is same.
+     * By default it will choose first the first matching name.
+     * For fix this you can quotes or equal-separated-option.
+     *
+     * @param string $value
+     *
+     * @return string
+     */
+    protected function fixValue(string $value): string
+    {
+        return sprintf('"%s"', Argument::clear($value));
     }
 
     /**
@@ -70,7 +86,7 @@ class DistributorTest extends TestCase
 
         $command = $this->distributor->getCommand();
 
-        $this->distributor->handleOptions($command);
+        $this->distributor->handleArguments($command);
 
         return $command->handle(
             $this->distributor->getNextArguments()
@@ -87,7 +103,7 @@ class DistributorTest extends TestCase
         return [
             [
                 [
-                    '--first', $this->command->getName()
+                    Argument::toOption('first'), $this->command->getName()
                 ]
             ]
         ];
@@ -120,10 +136,14 @@ class DistributorTest extends TestCase
         return [
             [
                 [
-                    '-s', '"' . $this->command->getName() . '"', $this->command->getName()
+                    Argument::toAbbreviation('s'),
+                    $this->fixValue($this->command->getName()),
+                    $this->command->getName()
                 ],
                 [
-                    '-fst', '"' . $this->command->getName() . '"', $this->command->getName()
+                    Argument::toAbbreviation('fst'),
+                    $this->fixValue($this->command->getName()),
+                    $this->command->getName()
                 ]
             ]
         ];
@@ -159,17 +179,26 @@ class DistributorTest extends TestCase
         return [
             [
                 [
-                    '--first=' . $this->command->getName(), $this->command->getName()
+                    Argument::toEqualSeparated(
+                        Argument::toOption('first'),
+                        $this->fixValue($this->command->getName()),
+                    ), $this->command->getName()
                 ]
             ],
             [
                 [
-                    '-f=' . $this->command->getName(), $this->command->getName()
+                    Argument::toEqualSeparated(
+                        Argument::toAbbreviation('f'),
+                        $this->fixValue($this->command->getName()),
+                    ), $this->command->getName()
                 ]
             ],
             [
                 [
-                    '-fst=' . $this->command->getName(), $this->command->getName()
+                    Argument::toEqualSeparated(
+                        Argument::toAbbreviation('fst'),
+                        $this->fixValue($this->command->getName()),
+                    ), $this->command->getName()
                 ]
             ]
         ];
@@ -217,17 +246,21 @@ class DistributorTest extends TestCase
         return [
             [
                 [
-                    '-f', '"' . $this->command->getName() . '"', $this->command->getName()
+                    Argument::toAbbreviation('f'),
+                    $this->fixValue($this->command->getName()),
+                    $this->command->getName()
                 ], false
             ],
             [
                 [
-                    '--first', '"' . $this->command->getName() . '"', $this->command->getName()
+                    Argument::toOption('first'),
+                    $this->fixValue($this->command->getName()),
+                    $this->command->getName()
                 ], false
             ],
             [
                 [
-                    '-f', $this->command->getName()
+                    Argument::toAbbreviation('f'), $this->command->getName()
                 ], true
             ]
         ];
@@ -270,12 +303,12 @@ class DistributorTest extends TestCase
         return [
             [
                 [
-                    '-f', $this->command->getName()
+                    Argument::toAbbreviation('f'), $this->command->getName()
                 ], false
             ],
             [
                 [
-                    '--first', $this->command->getName()
+                    Argument::toOption('first'), $this->command->getName()
                 ], false
             ],
             [
@@ -320,10 +353,14 @@ class DistributorTest extends TestCase
         return [
             [
                 [
-                    '-f', '"' . $this->command->getName() . '"', $this->command->getName()
+                    Argument::toAbbreviation('f'),
+                    $this->fixValue($this->command->getName()),
+                    $this->command->getName()
                 ],
                 [
-                    '--first', '"' . $this->command->getName() . '"', $this->command->getName()
+                    Argument::toOption('first'),
+                    $this->fixValue($this->command->getName()),
+                    $this->command->getName()
                 ]
             ]
         ];
@@ -359,7 +396,7 @@ class DistributorTest extends TestCase
         return [
             [
                 [
-                    '-fst', $this->command->getName()
+                    Argument::toAbbreviation('fst'), $this->command->getName()
                 ]
             ]
         ];
@@ -391,7 +428,7 @@ class DistributorTest extends TestCase
         return [
             [
                 [
-                    $this->command->getName(), '-f'
+                    $this->command->getName(), Argument::toAbbreviation('f')
                 ]
             ]
         ];
@@ -412,6 +449,6 @@ class DistributorTest extends TestCase
     {
         self::assertTrue($this->distribute($arguments));
 
-        self::assertEquals('-f', $this->command->getNextArguments()[0]);
+        self::assertEquals(Argument::toAbbreviation('f'), $this->command->getNextArguments()[0]);
     }
 }

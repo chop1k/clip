@@ -39,7 +39,7 @@ interface DistributorInterface
      * @param CommandInterface $command
      * The command given by getCommand method or default command if getCommand method returned null.
      */
-    public function handleOptions(CommandInterface $command): void;
+    public function handleArguments(CommandInterface $command): void;
 
     /**
      * Returns an array of next arguments, which will be transferred to the handle method of the command.

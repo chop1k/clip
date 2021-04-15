@@ -31,7 +31,3 @@ $source = new ConsoleArgumentsSource($argv);
 
 $arguments = $source->getArguments(); // returns the $argv
 ```
-
-By default, it ignores first argument of the $arguments.
-To turn off this, you should set $ignoreFirst parameter to false.
-You can do this via the constructor or an accessor.
