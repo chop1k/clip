@@ -201,6 +201,15 @@ class Distributor implements DistributorInterface
         ];
     }
 
+    /**
+     * Handles one argument.
+     *
+     * @param string $argument
+     *
+     * @param array $options
+     *
+     * @param array $values
+     */
     protected function handleArgument(string $argument, array &$options, array &$values): void
     {
         $type = $this->formatter->parse($argument);
@@ -229,6 +238,15 @@ class Distributor implements DistributorInterface
         }
     }
 
+    /**
+     * Handles option.
+     *
+     * @param string $option
+     *
+     * @param string $type
+     *
+     * @param array $options
+     */
     protected function handleOption(string $option, string $type, array &$options): void
     {
         if ($type === Argument::TYPE_ABBREVIATIONS) {
@@ -240,6 +258,13 @@ class Distributor implements DistributorInterface
         }
     }
 
+    /**
+     * Handles value.
+     *
+     * @param string $value
+     *
+     * @param array $values
+     */
     protected function handleValue(string $value, array &$values): void
     {
         $values[] = $value;
