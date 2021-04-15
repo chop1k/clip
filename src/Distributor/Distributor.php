@@ -188,36 +188,61 @@ class Distributor implements DistributorInterface
         $options = [];
         $values = [];
 
-        $handle = function ($argument, string $type) use (&$options, &$values) {
-            if ($type === Argument::TYPE_OPTION || $type === Argument::TYPE_ABBREVIATION) {
-                $options[] = $argument;
-            } elseif ($type === Argument::TYPE_VALUE || $type === Argument::TYPE_PURE_VALUE) {
-                $values[] = $argument;
-            }
-        };
-
         for ($i = 0; $i < count($this->arguments); $i++) {
             if ($i >= $this->commandPosition) {
                 break;
             }
 
-            $argument = $this->arguments[$i];
-
-            $type = $this->formatter->parse($argument);
-
-            if (
-                $type === Argument::TYPE_EQUAL_SEPARATED_OPTION ||
-                $type === Argument::TYPE_EQUAL_SEPARATED_ABBREVIATIONS
-            ) {
-                $this->handleEqualSeparated($argument, $handle);
-            } else {
-                $handle($argument, $type);
-            }
+            $this->handleArgument($this->arguments[$i], $options, $values);
         }
 
         return [
             $options, $values
         ];
+    }
+
+    protected function handleArgument(string $argument, array &$options, array &$values): void
+    {
+        $type = $this->formatter->parse($argument);
+
+        $handler = function (string $argument, string $type) use (&$options, &$values) {
+            if (
+                $type === Argument::TYPE_OPTION ||
+                $type === Argument::TYPE_ABBREVIATION || $type === Argument::TYPE_ABBREVIATIONS
+            ) {
+                $this->handleOption($argument, $type, $options);
+            }
+
+            if ($type === Argument::TYPE_PURE_VALUE || $type === Argument::TYPE_VALUE) {
+                $this->handleValue($argument, $values);
+            }
+        };
+
+        if (
+            $type === Argument::TYPE_EQUAL_SEPARATED_OPTION ||
+            $type === Argument::TYPE_EQUAL_SEPARATED_ABBREVIATION ||
+            $type === Argument::TYPE_EQUAL_SEPARATED_ABBREVIATIONS
+        ) {
+            $this->handleEqualSeparated($argument, $handler);
+        } else {
+            $handler($argument, $type);
+        }
+    }
+
+    protected function handleOption(string $option, string $type, array &$options): void
+    {
+        if ($type === Argument::TYPE_ABBREVIATIONS) {
+            foreach (str_split(Argument::clear($option)) as $value) {
+                $options[] = $this->formatter->format($value, Argument::TYPE_ABBREVIATION);
+            }
+        } else {
+            $options[] = $option;
+        }
+    }
+
+    protected function handleValue(string $value, array &$values): void
+    {
+        $values[] = $value;
     }
 
     /**
@@ -235,22 +260,14 @@ class Distributor implements DistributorInterface
 
         $type = $this->formatter->parse($option);
 
+        $handler($option, $this->formatter->parse($option));
+
         if ($type === Argument::TYPE_ABBREVIATIONS) {
-            $options = str_split(Argument::clear($option));
+            for ($i = 0; $i < strlen(Argument::clear($option)); $i++) {
+                $handler($value, $this->formatter->parse($value));
+            }
         } else {
-            $options = [$option];
-        }
-
-        foreach ($options as $char) {
-            $handler(
-                $this->formatter->format($char, Argument::TYPE_ABBREVIATION),
-                Argument::TYPE_ABBREVIATION
-            );
-
-            $handler(
-                $this->formatter->format($value, Argument::TYPE_PURE_VALUE),
-                Argument::TYPE_PURE_VALUE
-            );
+            $handler($value, $this->formatter->parse($value));
         }
     }
 
