@@ -34,9 +34,9 @@ class Distributor implements DistributorInterface
     /**
      * Contains a position of the command in the arguments.
      *
-     * @var int $commandPosition
+     * @var int|null $commandPosition
      */
-    protected int $commandPosition;
+    protected ?int $commandPosition;
 
     /**
      * Contains a formatter instance.
@@ -52,7 +52,7 @@ class Distributor implements DistributorInterface
      */
     public function __construct(FormatterInterface $formatter)
     {
-        $this->commandPosition = 0;
+        $this->commandPosition = null;
         $this->formatter = $formatter;
     }
 
@@ -189,7 +189,7 @@ class Distributor implements DistributorInterface
         $values = [];
 
         for ($i = 0; $i < count($this->arguments); $i++) {
-            if ($i >= $this->commandPosition) {
+            if ($this->commandPosition !== null && $i >= $this->commandPosition) {
                 break;
             }
 
@@ -350,6 +350,6 @@ class Distributor implements DistributorInterface
      */
     public function getNextArguments(): array
     {
-        return array_slice($this->arguments, $this->commandPosition + 1);
+        return ($this->commandPosition !== null) ? array_slice($this->arguments, $this->commandPosition + 1) : [];
     }
 }

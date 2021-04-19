@@ -1,6 +1,9 @@
 # Changelog
 Here is a list of versions with changes from first to last.
 
+## v2.1.1
+- Fixed bug where all arguments were ignored when using the default command.
+
 ## v2.1.0
 - Added FormatterInterface and Formatter with test:
 - DistributorInterface and Distributor:
