@@ -102,9 +102,9 @@ class Formatter implements FormatterInterface
     /**
      * Checks arguments for equal-separated type before they will be formatted.
      *
-     * @param $value
+     * @param mixed $value
      */
-    protected function checkEqualSeparatedArguments($value): void
+    protected function checkEqualSeparatedArguments(mixed $value): void
     {
         if (!is_array($value)) {
             throw new InvalidArgumentException(
@@ -124,13 +124,13 @@ class Formatter implements FormatterInterface
     /**
      * @inheritdoc
      *
-     * @param $value
+     * @param mixed $value
      *
      * @param string $type
      *
      * @return string
      */
-    public function format($value, string $type): string
+    public function format(mixed $value, string $type): string
     {
         if ($type === Argument::TYPE_OPTION) {
             return $this->formatOption($value);

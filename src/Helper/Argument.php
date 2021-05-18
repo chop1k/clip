@@ -76,7 +76,7 @@ class Argument
      *
      * @param string $argument
      *
-     * @return array
+     * @return string[]
      * First item of the array is an option(s), second item is a value.
      */
     public static function explodeEqualSeparated(string $argument): array

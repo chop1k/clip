@@ -55,12 +55,27 @@ class Option implements OptionInterface
      */
     protected bool $indicated;
 
+    /**
+     * Option constructor.
+     *
+     * @param string $name
+     *
+     * @param string|null $abbreviation
+     *
+     * @param bool $required
+     *
+     * @param bool $requiresValue
+     *
+     * @param mixed|null $value
+     *
+     * @param bool $indicated
+     */
     public function __construct(
         string $name,
         ?string $abbreviation,
         bool $required,
         bool $requiresValue,
-        $value = '',
+        mixed $value = null,
         bool $indicated = false
     ) {
         $this->name = $name;

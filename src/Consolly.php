@@ -57,6 +57,8 @@ class Consolly
     protected DistributorInterface $distributor;
 
     /**
+     * Event dispatcher for dispatching and listening events.
+     *
      * @var EventDispatcherInterface $dispatcher
      */
     protected EventDispatcherInterface $dispatcher;
@@ -178,6 +180,8 @@ class Consolly
     }
 
     /**
+     * Returns the symfony dispatcher.
+     *
      * @return EventDispatcherInterface
      */
     public function getDispatcher(): EventDispatcherInterface
@@ -186,6 +190,8 @@ class Consolly
     }
 
     /**
+     * Sets the symfony dispatcher.
+     *
      * @param EventDispatcherInterface $dispatcher
      */
     public function setDispatcher(EventDispatcherInterface $dispatcher): void
@@ -193,6 +199,9 @@ class Consolly
         $this->dispatcher = $dispatcher;
     }
 
+    /**
+     * Invokes the {@link DistributorEvents::COMMANDS} event and sets commands.
+     */
     protected function invokeCommands(): void
     {
         $commands = $this->commands;
@@ -208,6 +217,9 @@ class Consolly
         $this->distributor->setCommands($commands);
     }
 
+    /**
+     * Invokes the {@link SourceEvents::ARGUMENTS} event and pass it to the distributor.
+     */
     protected function invokeArguments(): void
     {
         $arguments = $this->source->getArguments();
@@ -223,6 +235,16 @@ class Consolly
         $this->distributor->setArguments($arguments);
     }
 
+    /**
+     * Invokes {@link DistributorEvents::COMMAND_NOT_FOUND} if command not found.
+     *
+     * Invokes {@link DistributorEvents::COMMAND_FOUND} if command found
+     * even if {@link DistributorEvents::COMMAND_NOT_FOUND} was invoked.
+     *
+     * @return CommandInterface
+     *
+     * @throws CommandNotFoundException If no command found and listener not set command.
+     */
     protected function invokeSearch(): CommandInterface
     {
         $command = $this->distributor->getCommand();
@@ -256,6 +278,11 @@ class Consolly
         return $command;
     }
 
+    /**
+     * Invokes the {@link DistributorEvents::NEXT_ARGUMENTS} event.
+     *
+     * @return array
+     */
     protected function invokeNextArguments(): array
     {
         $arguments = $this->distributor->getNextArguments();
@@ -278,7 +305,7 @@ class Consolly
      * @return mixed|void
      * Returns a result of handle() function of the command or void if none.
      *
-     * @throws CommandNotFoundException
+     * @throws CommandNotFoundException|Throwable
      * Throws when the command not found and the default command not defined.
      */
     public function handle()

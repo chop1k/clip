@@ -22,12 +22,17 @@ class Command implements CommandInterface
      */
     protected string $name;
 
+    /**
+     * Contains command aliases.
+     *
+     * @var string[] $aliases
+     */
     protected array $aliases;
 
     /**
      * Contains an array of options.
      *
-     * @var array $options
+     * @var OptionInterface[] $options
      */
     protected array $options;
 
@@ -55,7 +60,7 @@ class Command implements CommandInterface
     }
 
     /**
-     * @param array $aliases
+     * @param string[] $aliases
      */
     public function setAliases(array $aliases): void
     {
@@ -73,7 +78,7 @@ class Command implements CommandInterface
     /**
      * Sets commands options
      *
-     * @param array $options
+     * @param OptionInterface[] $options
      */
     public function setOptions(array $options): void
     {

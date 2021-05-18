@@ -14,14 +14,14 @@ interface DistributorInterface
     /**
      * Sets an array of the commands.
      *
-     * @param array $commands
+     * @param CommandInterface[] $commands
      */
     public function setCommands(array $commands): void;
 
     /**
      * Sets an array of argument which will be handled.
      *
-     * @param array $arguments
+     * @param string[] $arguments
      */
     public function setArguments(array $arguments): void;
 
@@ -44,7 +44,7 @@ interface DistributorInterface
     /**
      * Returns an array of next arguments, which will be transferred to the handle method of the command.
      *
-     * @return array
+     * @return string[]
      */
     public function getNextArguments(): array;
 }
