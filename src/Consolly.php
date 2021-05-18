@@ -76,13 +76,15 @@ class Consolly
     public function __construct(
         SourceInterface $source,
         DistributorInterface $distributor,
-        ?CommandInterface $defaultCommand = null
+        ?CommandInterface $defaultCommand = null,
+        ?EventDispatcherInterface $dispatcher = null
     ) {
         $this->defaultCommand = $defaultCommand;
         $this->source = $source;
         $this->distributor = $distributor;
         $this->commands = [];
-        $this->dispatcher = new EventDispatcher();
+
+        $this->dispatcher = $dispatcher === null ? new EventDispatcher() : $dispatcher;
     }
 
     /**

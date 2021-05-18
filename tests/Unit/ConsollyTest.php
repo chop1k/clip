@@ -1,6 +1,6 @@
 <?php
 
-namespace Consolly\Tests;
+namespace Consolly\Tests\Unit;
 
 use Consolly\Command\CommandInterface;
 use Consolly\Consolly;
