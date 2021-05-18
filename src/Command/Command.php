@@ -22,6 +22,8 @@ class Command implements CommandInterface
      */
     protected string $name;
 
+    protected array $aliases;
+
     /**
      * Contains an array of options.
      *
@@ -45,6 +47,19 @@ class Command implements CommandInterface
     public function setName(string $name): void
     {
         $this->name = $name;
+    }
+
+    public function getAliases(): array
+    {
+        return $this->aliases;
+    }
+
+    /**
+     * @param array $aliases
+     */
+    public function setAliases(array $aliases): void
+    {
+        $this->aliases = $aliases;
     }
 
     /**

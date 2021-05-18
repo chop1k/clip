@@ -4,11 +4,22 @@ namespace Consolly;
 
 use Consolly\Command\CommandInterface;
 use Consolly\Distributor\Distributor;
+use Consolly\Distributor\DistributorEvents;
 use Consolly\Distributor\DistributorInterface;
+use Consolly\Event\Consolly\ExceptionEvent;
+use Consolly\Event\Distributor\CommandFoundEvent;
+use Consolly\Event\Distributor\CommandNotFoundEvent;
+use Consolly\Event\Distributor\CommandsEvent;
+use Consolly\Event\Distributor\NextArgumentsEvent;
+use Consolly\Event\Source\ArgumentsEvent;
 use Consolly\Exception\CommandNotFoundException;
 use Consolly\Formatter\Formatter;
 use Consolly\Source\ConsoleArgumentsSource;
+use Consolly\Source\SourceEvents;
 use Consolly\Source\SourceInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Throwable;
 
 /**
  * Class Consolly contains main functional for working with Consolly architecture.
@@ -44,6 +55,35 @@ class Consolly
      * @var DistributorInterface $distributor
      */
     protected DistributorInterface $distributor;
+
+    /**
+     * @var EventDispatcherInterface $dispatcher
+     */
+    protected EventDispatcherInterface $dispatcher;
+
+    /**
+     * Consolly constructor.
+     *
+     * @param SourceInterface $source
+     * Source for getting arguments.
+     *
+     * @param DistributorInterface $distributor
+     * Distributor for distributing arguments from the source.
+     *
+     * @param CommandInterface|null $defaultCommand
+     * Default command which will be executed if no command was found by distributor.
+     */
+    public function __construct(
+        SourceInterface $source,
+        DistributorInterface $distributor,
+        ?CommandInterface $defaultCommand = null
+    ) {
+        $this->defaultCommand = $defaultCommand;
+        $this->source = $source;
+        $this->distributor = $distributor;
+        $this->commands = [];
+        $this->dispatcher = new EventDispatcher();
+    }
 
     /**
      * Returns an array of registered commands.
@@ -136,62 +176,137 @@ class Consolly
     }
 
     /**
-     * Consolly constructor.
-     *
-     * @param SourceInterface $source
-     * Source for getting arguments.
-     *
-     * @param DistributorInterface $distributor
-     * Distributor for distributing arguments from the source.
-     *
-     * @param CommandInterface|null $defaultCommand
-     * Default command which will be executed if no command was found by distributor.
+     * @return EventDispatcherInterface
      */
-    public function __construct(
-        SourceInterface $source,
-        DistributorInterface $distributor,
-        ?CommandInterface $defaultCommand = null
-    ) {
-        $this->defaultCommand = $defaultCommand;
-        $this->source = $source;
-        $this->distributor = $distributor;
-        $this->commands = [];
+    public function getDispatcher(): EventDispatcherInterface
+    {
+        return $this->dispatcher;
+    }
+
+    /**
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function setDispatcher(EventDispatcherInterface $dispatcher): void
+    {
+        $this->dispatcher = $dispatcher;
+    }
+
+    protected function invokeCommands(): void
+    {
+        $commands = $this->commands;
+
+        if ($this->dispatcher->hasListeners(DistributorEvents::COMMANDS)) {
+            $event = new CommandsEvent($commands);
+
+            $this->dispatcher->dispatch($event, DistributorEvents::COMMANDS);
+
+            $commands = $event->getCommands();
+        }
+
+        $this->distributor->setCommands($commands);
+    }
+
+    protected function invokeArguments(): void
+    {
+        $arguments = $this->source->getArguments();
+
+        if ($this->dispatcher->hasListeners(SourceEvents::ARGUMENTS)) {
+            $event = new ArgumentsEvent($arguments);
+
+            $this->dispatcher->dispatch($event, SourceEvents::ARGUMENTS);
+
+            $arguments = $event->getArguments();
+        }
+
+        $this->distributor->setArguments($arguments);
+    }
+
+    protected function invokeSearch(): CommandInterface
+    {
+        $command = $this->distributor->getCommand();
+
+        if ($command === null) {
+            if ($this->defaultCommand === null) {
+                if ($this->dispatcher->hasListeners(DistributorEvents::COMMAND_NOT_FOUND)) {
+                    $event = new CommandNotFoundEvent($this->commands);
+
+                    $this->dispatcher->dispatch($event, DistributorEvents::COMMAND_NOT_FOUND);
+
+                    $command = $event->getCommand();
+                }
+
+                if ($command === null) {
+                    throw new CommandNotFoundException('Command not found. ');
+                }
+            } else {
+                $command = $this->defaultCommand;
+            }
+        }
+
+        if ($this->dispatcher->hasListeners(DistributorEvents::COMMAND_FOUND)) {
+            $event = new CommandFoundEvent($command);
+
+            $this->dispatcher->dispatch($event, DistributorEvents::COMMAND_FOUND);
+
+            $command = $event->getCommand();
+        }
+
+        return $command;
+    }
+
+    protected function invokeNextArguments(): array
+    {
+        $arguments = $this->distributor->getNextArguments();
+
+        if ($this->dispatcher->hasListeners(DistributorEvents::NEXT_ARGUMENTS)) {
+            $event = new NextArgumentsEvent($arguments);
+
+            $this->dispatcher->dispatch($event, DistributorEvents::NEXT_ARGUMENTS);
+
+            $arguments = $event->getArguments();
+        }
+
+
+        return $arguments;
     }
 
     /**
      * Handles commands by given args.
      *
-     * @return mixed
-     * Returns a result of handle() function of the command.
+     * @return mixed|void
+     * Returns a result of handle() function of the command or void if none.
      *
      * @throws CommandNotFoundException
      * Throws when the command not found and the default command not defined.
      */
     public function handle()
     {
-        $this->distributor->setCommands(
-            $this->commands
-        );
+        try {
+            $this->invokeCommands();
+            $this->invokeArguments();
 
-        $this->distributor->setArguments(
-            $this->source->getArguments()
-        );
+            $command = $this->invokeSearch();
 
-        $command = $this->distributor->getCommand();
+            $this->distributor->handleArguments($command);
 
-        if (is_null($command)) {
-            if (is_null($this->defaultCommand)) {
-                throw new CommandNotFoundException('Command not found. ');
+            return $command->handle(
+                $this->invokeNextArguments()
+            );
+        } catch (Throwable $throwable) {
+            if ($this->dispatcher->hasListeners(ConsollyEvents::EXCEPTION)) {
+                $event = new ExceptionEvent($throwable);
+
+                $this->dispatcher->dispatch($event, ConsollyEvents::EXCEPTION);
+
+                if ($event->getResult() !== null) {
+                    return $event->getResult();
+                }
+
+                $throwable = $event->getThrowable();
             }
 
-            $command = $this->defaultCommand;
+            throw $throwable;
         }
-
-        $this->distributor->handleArguments($command);
-
-        return $command->handle(
-            $this->distributor->getNextArguments()
-        );
     }
 
     /**

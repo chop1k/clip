@@ -93,7 +93,7 @@ class Argument
      */
     protected static function startsWithOptionPrefix(string $argument): bool
     {
-        return strpos($argument, "--") === 0;
+        return str_starts_with($argument, "--");
     }
 
     /**
@@ -105,7 +105,7 @@ class Argument
      */
     protected static function startsWithAbbreviationPrefix(string $argument): bool
     {
-        return strpos($argument, "-") === 0;
+        return str_starts_with($argument, "-");
     }
 
     /**
@@ -117,7 +117,7 @@ class Argument
      */
     protected static function containsEqualSeparation(string $argument): bool
     {
-        return strpos($argument, '=') !== false;
+        return str_contains($argument, '=');
     }
 
     /**

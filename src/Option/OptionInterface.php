@@ -40,7 +40,7 @@ interface OptionInterface
      * @param mixed $value
      * Option value.
      */
-    public function setValue($value): void;
+    public function setValue(mixed $value): void;
 
     /**
      * Returns true if option is required, false otherwise.

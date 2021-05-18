@@ -7,7 +7,6 @@ use Consolly\Exception\OptionRequiredException;
 use Consolly\Exception\OptionRequiresValueException;
 use Consolly\Formatter\FormatterInterface;
 use Consolly\Helper\Argument;
-use Consolly\Option\OptionInterface;
 use InvalidArgumentException;
 
 /**
@@ -80,6 +79,10 @@ class Distributor implements DistributorInterface
          */
         foreach ($commands as $command) {
             $handledCommands[$command->getName()] = $command;
+
+            foreach ($command->getAliases() as $alias) {
+                $handledCommands[$alias] = $command;
+            }
         }
 
         return $handledCommands;
@@ -151,9 +154,6 @@ class Distributor implements DistributorInterface
         $commandOptions = [];
         $requiredOptionsNumber = 0;
 
-        /**
-         * @var OptionInterface $option
-         */
         foreach ($command->getOptions() as $option) {
             $name = $this->formatter->format($option->getName(), Argument::TYPE_OPTION);
 
