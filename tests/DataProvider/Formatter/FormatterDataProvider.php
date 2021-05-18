@@ -1,22 +1,11 @@
 <?php
 
-namespace Consolly\Tests\Formatter;
+namespace Consolly\Tests\DataProvider\Formatter;
 
-use Consolly\Formatter\Formatter;
-use Consolly\Formatter\FormatterInterface;
 use Consolly\Helper\Argument;
-use InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
 
-class FormatterTest extends TestCase
+class FormatterDataProvider
 {
-    protected FormatterInterface $formatter;
-
-    protected function setUp(): void
-    {
-        $this->formatter = new Formatter();
-    }
-
     public function getParseArguments(): array
     {
         return [
@@ -53,17 +42,6 @@ class FormatterTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getParseArguments
-     *
-     * @param string $argument
-     * @param string $type
-     */
-    public function testParse(string $argument, string $type): void
-    {
-        self::assertEquals($type, $this->formatter->parse($argument));
-    }
-
     public function getFormatArguments(): array
     {
         return [
@@ -86,15 +64,6 @@ class FormatterTest extends TestCase
                 ['abc', 'value'], '-abc=value', Argument::TYPE_EQUAL_SEPARATED_ABBREVIATIONS
             ],
             [
-                ['abc'], '', Argument::TYPE_EQUAL_SEPARATED_ABBREVIATIONS, true
-            ],
-            [
-                ['abc', null], '', Argument::TYPE_EQUAL_SEPARATED_ABBREVIATIONS, true
-            ],
-            [
-                [null, null], '', Argument::TYPE_EQUAL_SEPARATED_ABBREVIATIONS, true
-            ],
-            [
                 ['', ''], '-=', Argument::TYPE_EQUAL_SEPARATED_ABBREVIATIONS
             ],
             [
@@ -115,20 +84,18 @@ class FormatterTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getFormatArguments
-     *
-     * @param $raw
-     * @param string $expected
-     * @param string $type
-     * @param bool $exception
-     */
-    public function testFormat($raw, string $expected, string $type, bool $exception = false): void
+    public function getFormatExceptionArguments(): array
     {
-        if ($exception) {
-            $this->expectException(InvalidArgumentException::class);
-        }
-
-        self::assertEquals($expected, $this->formatter->format($raw, $type));
+        return [
+            [
+                ['abc'], Argument::TYPE_EQUAL_SEPARATED_ABBREVIATIONS
+            ],
+            [
+                ['abc', null], Argument::TYPE_EQUAL_SEPARATED_ABBREVIATIONS
+            ],
+            [
+                [null, null], Argument::TYPE_EQUAL_SEPARATED_ABBREVIATIONS
+            ],
+        ];
     }
 }

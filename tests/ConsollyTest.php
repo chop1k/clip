@@ -4,12 +4,8 @@ namespace Consolly\Tests;
 
 use Consolly\Command\CommandInterface;
 use Consolly\Consolly;
-use Consolly\Distributor\Distributor;
 use Consolly\Exception\CommandNotFoundException;
-use Consolly\Formatter\Formatter;
-use Consolly\Source\ConsoleArgumentsSource;
-use Consolly\Tests\Command\DefaultTestCommand;
-use Consolly\Tests\Command\TestCommand;
+use Consolly\Tests\DataProvider\ConsollyDataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -19,6 +15,15 @@ use PHPUnit\Framework\TestCase;
  */
 class ConsollyTest extends TestCase
 {
+    protected ConsollyDataProvider $dataProvider;
+
+    public function __construct(?string $name = null, array $data = [], $dataName = '')
+    {
+        parent::__construct($name, $data, $dataName);
+
+        $this->dataProvider = new ConsollyDataProvider();
+    }
+
     /**
      * Returns dataset for testDefaultCommand test.
      *
@@ -26,31 +31,7 @@ class ConsollyTest extends TestCase
      */
     public function getDefaultCommandArguments(): array
     {
-        return [
-            [
-                [
-                    'unknown-command'
-                ], new DefaultTestCommand(), true
-            ],
-            [
-                [
-                    'unknown-command'
-                ], new DefaultTestCommand(), false
-            ],
-            [
-                [
-                    ''
-                ], null, false
-            ],
-            [
-                [
-                ], new TestCommand(), false
-            ],
-            [
-                [
-                ], new TestCommand(), true
-            ]
-        ];
+        return $this->dataProvider->getDefaultCommandArguments();
     }
 
     /**
@@ -62,26 +43,19 @@ class ConsollyTest extends TestCase
      *
      * @param CommandInterface|null $defaultCommand
      *
-     * @param bool $addCommand
-     *
      * @throws CommandNotFoundException
      */
-    public function testDefaultCommand(array $arguments, ?CommandInterface $defaultCommand, bool $addCommand): void
+    public function testDefaultCommand(array $arguments, ?CommandInterface $defaultCommand): void
     {
-        if (is_null($defaultCommand)) {
-            $this->expectException(CommandNotFoundException::class);
-        }
+        $commandExecuted = Consolly::default($arguments, $defaultCommand)->handle();
 
-        $consolly = new Consolly(
-            new ConsoleArgumentsSource($arguments),
-            new Distributor(new Formatter()),
-            $defaultCommand
-        );
+        self::assertTrue($commandExecuted);
+    }
 
-        if ($addCommand) {
-            $consolly->addCommand(new TestCommand());
-        }
+    public function testCommandNotFound(): void
+    {
+        $this->expectException(CommandNotFoundException::class);
 
-        self::assertTrue($consolly->handle());
+        Consolly::default([])->handle();
     }
 }

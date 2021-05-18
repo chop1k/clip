@@ -1,15 +1,11 @@
 <phpunit
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/sebastianbergmann/phpunit/9.3.8/phpunit.xsd"
-        convertErrorsToExceptions="true"
-        convertNoticesToExceptions="true"
-        convertDeprecationsToExceptions="true"
-        convertWarningsToExceptions="true"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/sebastianbergmann/phpunit/9.5.4/phpunit.xsd"
         cacheResult="false"
 >
     <testsuites>
         <testsuite name="Consolly Test Suite">
-            <directory>./tests</directory>
+            <directory>./tests/Unit</directory>
         </testsuite>
     </testsuites>
 </phpunit>
