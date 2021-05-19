@@ -3,9 +3,20 @@
 namespace Consolly\Tests\DataProvider\Formatter;
 
 use Consolly\Helper\Argument;
+use Consolly\Tests\Unit\Formatter\FormatterTest;
 
+/**
+ * Class FormatterDataProvider represents data provider for {@link FormatterTest} test.
+ *
+ * @package Consolly\Tests\DataProvider\Formatter
+ */
 class FormatterDataProvider
 {
+    /**
+     * Returns data for {@link FormatterTest::testParse()} test.
+     *
+     * @return string[][]
+     */
     public function getParseArguments(): array
     {
         return [
@@ -42,6 +53,11 @@ class FormatterDataProvider
         ];
     }
 
+    /**
+     * Returns data for {@link FormatterTest::testParse()} test.
+     *
+     * @return string[][]
+     */
     public function getFormatArguments(): array
     {
         return [
@@ -84,6 +100,11 @@ class FormatterDataProvider
         ];
     }
 
+    /**
+     * Returns data for {@link FormatterTest::testFormatException()} test.
+     *
+     * @return array[][]
+     */
     public function getFormatExceptionArguments(): array
     {
         return [

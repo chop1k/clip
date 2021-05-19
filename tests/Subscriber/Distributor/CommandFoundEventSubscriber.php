@@ -8,8 +8,21 @@ use Consolly\Event\Distributor\CommandFoundEvent;
 use Consolly\Tests\Subscriber\TestEventSubscriber;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Class CommandFoundEventSubscriber represents event subscriber
+ * used for {@link DistributorEvents::COMMAND_FOUND} testing.
+ *
+ * @package Consolly\Tests\Subscriber\Distributor
+ */
 class CommandFoundEventSubscriber extends TestEventSubscriber implements EventSubscriberInterface
 {
+    /**
+     * CommandFoundEventSubscriber constructor.
+     *
+     * @param CommandInterface $expectedCommand
+     *
+     * @param CommandInterface $commandToOverride
+     */
     public function __construct(
         protected CommandInterface $expectedCommand,
         protected CommandInterface $commandToOverride
@@ -17,6 +30,9 @@ class CommandFoundEventSubscriber extends TestEventSubscriber implements EventSu
         parent::__construct();
     }
 
+    /**
+     * @inheritDoc
+     */
     public static function getSubscribedEvents(): array
     {
         return [
@@ -24,6 +40,11 @@ class CommandFoundEventSubscriber extends TestEventSubscriber implements EventSu
         ];
     }
 
+    /**
+     * {@link DistributorEvents::COMMAND_FOUND} event handler.
+     *
+     * @param CommandFoundEvent $event
+     */
     public function onCommandFound(CommandFoundEvent $event): void
     {
         $this->setExecuted(true);

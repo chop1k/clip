@@ -40,6 +40,11 @@ class TestCommand extends Command
      */
     protected array $nextArguments;
 
+    /**
+     * Determines if the command is executed.
+     *
+     * @var bool $executed
+     */
     protected bool $executed;
 
     /**
@@ -122,6 +127,8 @@ class TestCommand extends Command
     }
 
     /**
+     * Returns true if the command handle method is executed.
+     *
      * @return bool
      */
     public function isExecuted(): bool
@@ -130,6 +137,8 @@ class TestCommand extends Command
     }
 
     /**
+     * Sets whether the command handle method is executed.
+     *
      * @param bool $executed
      */
     public function setExecuted(bool $executed): void

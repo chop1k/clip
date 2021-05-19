@@ -2,8 +2,20 @@
 
 namespace Consolly\Tests\DataProvider\Helper;
 
+use Consolly\Tests\Unit\Helper\ArgumentTest;
+
+/**
+ * Class ArgumentDataProvider represents data provider for {@link ArgumentTest} test.
+ *
+ * @package Consolly\Tests\DataProvider\Helper
+ */
 class ArgumentDataProvider
 {
+    /**
+     * Returns data for {@link ArgumentTest::testClear()} test.
+     *
+     * @return string[][]
+     */
     public function getClearArguments(): array
     {
         return [
@@ -37,6 +49,11 @@ class ArgumentDataProvider
         ];
     }
 
+    /**
+     * Returns data for {@link ArgumentTest::testExplodeEqualSeparatedOption()} test.
+     *
+     * @return array[]
+     */
     public function getExplodeEqualSeparatedOptionArguments(): array
     {
         return [
@@ -61,6 +78,11 @@ class ArgumentDataProvider
         ];
     }
 
+    /**
+     * Returns data for {@link ArgumentTest::testIsOption()} test.
+     *
+     * @return array[]
+     */
     public function getIsOptionArguments(): array
     {
         return [
@@ -94,6 +116,11 @@ class ArgumentDataProvider
         ];
     }
 
+    /**
+     * Returns data for {@link ArgumentTest::testIsAbbreviation()} test.
+     *
+     * @return array[]
+     */
     public function getIsAbbreviationArguments(): array
     {
         return [
@@ -127,6 +154,11 @@ class ArgumentDataProvider
         ];
     }
 
+    /**
+     * Returns data for {@link ArgumentTest::testIsAbbreviations()} test.
+     *
+     * @return array[]
+     */
     public function getIsAbbreviationsArguments(): array
     {
         return [
@@ -160,6 +192,11 @@ class ArgumentDataProvider
         ];
     }
 
+    /**
+     * Returns data for {@link ArgumentTest::testIsValue()} test.
+     *
+     * @return array[]
+     */
     public function getIsValueArguments(): array
     {
         return [
@@ -193,6 +230,11 @@ class ArgumentDataProvider
         ];
     }
 
+    /**
+     * Returns data for {@link ArgumentTest::testIsPureValue()} test.
+     *
+     * @return array[]
+     */
     public function getIsPureValueArguments(): array
     {
         return [
@@ -226,6 +268,11 @@ class ArgumentDataProvider
         ];
     }
 
+    /**
+     * Returns data for {@link ArgumentTest::testToOption()} test.
+     *
+     * @return string[][]
+     */
     public function getToOptionArguments(): array
     {
         return [
@@ -235,6 +282,11 @@ class ArgumentDataProvider
         ];
     }
 
+    /**
+     * Returns data for {@link ArgumentTest::testToAbbreviation()} test.
+     *
+     * @return string[][]
+     */
     public function getToAbbreviationArguments(): array
     {
         return [
@@ -247,6 +299,11 @@ class ArgumentDataProvider
         ];
     }
 
+    /**
+     * Returns data for {@link ArgumentTest::testToEqualSeparated()} test.
+     *
+     * @return string[][]
+     */
     public function getToEqualSeparatedArguments(): array
     {
         return [
@@ -265,6 +322,11 @@ class ArgumentDataProvider
         ];
     }
 
+    /**
+     * Returns data for {@link ArgumentTest::testToValue()} test.
+     *
+     * @return string[][]
+     */
     public function getToValueArguments(): array
     {
         return [
@@ -280,6 +342,11 @@ class ArgumentDataProvider
         ];
     }
 
+    /**
+     * Returns data for {@link ArgumentTest::testToPureValue()} test.
+     *
+     * @return string[][]
+     */
     public function getToPureValueArguments(): array
     {
         return [

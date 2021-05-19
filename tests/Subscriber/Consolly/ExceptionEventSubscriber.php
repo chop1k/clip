@@ -8,8 +8,20 @@ use Consolly\Tests\Subscriber\TestEventSubscriber;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Throwable;
 
+/**
+ * Class ExceptionEventSubscriber represents event subscriber used for {@link ConsollyEvents::EXCEPTION} testing.
+ *
+ * @package Consolly\Tests\Subscriber\Consolly
+ */
 class ExceptionEventSubscriber extends TestEventSubscriber implements EventSubscriberInterface
 {
+    /**
+     * ExceptionEventSubscriber constructor.
+     *
+     * @param string $expectedException
+     *
+     * @param Throwable $exceptionToOverride
+     */
     public function __construct(protected string $expectedException, protected Throwable $exceptionToOverride)
     {
         parent::__construct();
@@ -25,6 +37,11 @@ class ExceptionEventSubscriber extends TestEventSubscriber implements EventSubsc
         ];
     }
 
+    /**
+     * {@link ConsollyEvents::EXCEPTION} event handler.
+     *
+     * @param ExceptionEvent $event
+     */
     public function onException(ExceptionEvent $event): void
     {
         $this->setExecuted(true);

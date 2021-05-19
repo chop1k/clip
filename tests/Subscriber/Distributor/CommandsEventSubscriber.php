@@ -7,8 +7,20 @@ use Consolly\Event\Distributor\CommandsEvent;
 use Consolly\Tests\Subscriber\TestEventSubscriber;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Class CommandsEventSubscriber represents event subscriber used for {@link DistributorEvents::COMMANDS} testing.
+ *
+ * @package Consolly\Tests\Subscriber\Distributor
+ */
 class CommandsEventSubscriber extends TestEventSubscriber implements EventSubscriberInterface
 {
+    /**
+     * CommandsEventSubscriber constructor.
+     *
+     * @param array $expectedCommands
+     *
+     * @param array $commandsToOverride
+     */
     public function __construct(protected array $expectedCommands, protected array $commandsToOverride)
     {
         parent::__construct();
@@ -24,6 +36,11 @@ class CommandsEventSubscriber extends TestEventSubscriber implements EventSubscr
         ];
     }
 
+    /**
+     * {@link DistributorEvents::COMMANDS} event handler.
+     *
+     * @param CommandsEvent $event
+     */
     public function onCommands(CommandsEvent $event): void
     {
         $this->setExecuted(true);

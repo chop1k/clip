@@ -11,6 +11,11 @@ use Consolly\Command\Command;
  */
 class DefaultTestCommand extends Command
 {
+    /**
+     * Determines if the command is executed.
+     *
+     * @var bool $executed
+     */
     protected bool $executed;
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Consolly\Tests\DataProvider;
 
+use Consolly\Consolly;
 use Consolly\ConsollyBuilder;
 use Consolly\ConsollyEvents;
 use Consolly\Distributor\Distributor;
@@ -14,10 +15,21 @@ use Consolly\Tests\Subscriber\Consolly\ExceptionEventSubscriber;
 use Consolly\Tests\Subscriber\Distributor\CommandsEventSubscriber;
 use Consolly\Tests\Subscriber\Distributor\NextArgumentsEventSubscriber;
 use Consolly\Tests\Subscriber\Source\ArgumentsEventSubscriber;
+use Consolly\Tests\Unit\ConsollyBuilderTest;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
+/**
+ * Class ConsollyBuilderDataProvider represents data provider for {@link ConsollyBuilderTest} test.
+ *
+ * @package Consolly\Tests\DataProvider
+ */
 class ConsollyBuilderDataProvider
 {
+    /**
+     * Returns data for {@link ConsollyBuilderTest::testWithDispatcher()} test.
+     *
+     * @return Consolly[][]
+     */
     public function getWithDispatcherArguments(): array
     {
         return [
@@ -29,6 +41,11 @@ class ConsollyBuilderDataProvider
         ];
     }
 
+    /**
+     * Returns data for {@link ConsollyBuilderTest::testWithDistributor()} test.
+     *
+     * @return Consolly[][]
+     */
     public function getWithDistributorArguments(): array
     {
         return [
@@ -40,6 +57,11 @@ class ConsollyBuilderDataProvider
         ];
     }
 
+    /**
+     * Returns data for {@link ConsollyBuilderTest::testWithSource()} test.
+     *
+     * @return Consolly[][]
+     */
     public function getWithSourceArguments(): array
     {
         return [
@@ -51,6 +73,11 @@ class ConsollyBuilderDataProvider
         ];
     }
 
+    /**
+     * Returns data for {@link ConsollyBuilderTest::testWithDefaultCommand()} test.
+     *
+     * @return Consolly[][]
+     */
     public function getWithDefaultCommandArguments(): array
     {
         return [
@@ -62,6 +89,11 @@ class ConsollyBuilderDataProvider
         ];
     }
 
+    /**
+     * Returns data for {@link ConsollyBuilderTest::testWithCommand()} test.
+     *
+     * @return Consolly[][]
+     */
     public function getWithCommandArguments(): array
     {
         return [
@@ -73,6 +105,11 @@ class ConsollyBuilderDataProvider
         ];
     }
 
+    /**
+     * Returns data for {@link ConsollyBuilderTest::testWithCommands()} test.
+     *
+     * @return Consolly[][]
+     */
     public function getWithCommandsArguments(): array
     {
         return [
@@ -87,6 +124,11 @@ class ConsollyBuilderDataProvider
         ];
     }
 
+    /**
+     * Returns data for {@link ConsollyBuilderTest::testWithListener()} test.
+     *
+     * @return Consolly[][]
+     */
     public function getWithListenerArguments(): array
     {
         return [
@@ -98,6 +140,11 @@ class ConsollyBuilderDataProvider
         ];
     }
 
+    /**
+     * Returns data for {@link ConsollyBuilderTest::testWithListeners()} test.
+     *
+     * @return Consolly[][]
+     */
     public function getWithListenersArguments(): array
     {
         return [
@@ -112,6 +159,11 @@ class ConsollyBuilderDataProvider
         ];
     }
 
+    /**
+     * Returns data for {@link ConsollyBuilderTest::testWithSubscriber()} test.
+     *
+     * @return Consolly[][]
+     */
     public function getWithSubscriberArguments(): array
     {
         return [
@@ -123,6 +175,11 @@ class ConsollyBuilderDataProvider
         ];
     }
 
+    /**
+     * Returns data for {@link ConsollyBuilderTest::testWithSubscribers()} test.
+     *
+     * @return Consolly[][]
+     */
     public function getWithSubscribersArguments(): array
     {
         return [
@@ -137,6 +194,11 @@ class ConsollyBuilderDataProvider
         ];
     }
 
+    /**
+     * Returns data for {@link ConsollyBuilderTest::testSourceAndArgumentsNotProvidedException()} test.
+     *
+     * @return Consolly[][]
+     */
     public function getSourceAndArgumentsNotProvidedExceptionArguments(): array
     {
         return [

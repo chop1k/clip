@@ -3,6 +3,7 @@
 namespace Consolly\Tests\Unit\Event\Consolly;
 
 use Consolly\Consolly;
+use Consolly\ConsollyEvents;
 use Consolly\Exception\CommandNotFoundException;
 use Consolly\Tests\DataProvider\Event\Consolly\ExceptionSubscriberDataProvider;
 use Consolly\Tests\Exception\TestException;
@@ -10,18 +11,51 @@ use Consolly\Tests\Subscriber\Consolly\ExceptionEventSubscriber;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
+/**
+ * Class ExceptionSubscriberTest represents test for {@link ConsollyEvents::EXCEPTION} event.
+ *
+ * @package Consolly\Tests\Unit\Event\Consolly
+ */
 class ExceptionSubscriberTest extends TestCase
 {
+    /**
+     * Consolly instance for dispatching events.
+     *
+     * @var Consolly $consolly
+     */
     protected Consolly $consolly;
 
+    /**
+     * Data provider for the subscriber.
+     *
+     * @var ExceptionSubscriberDataProvider $dataProvider
+     */
     protected ExceptionSubscriberDataProvider $dataProvider;
 
+    /**
+     * The subscriber which subscribes to the event.
+     *
+     * @var ExceptionEventSubscriber $subscriber
+     */
     protected ExceptionEventSubscriber $subscriber;
 
+    /**
+     * Exception class to expect.
+     *
+     * @var string $expectedException
+     */
     protected string $expectedException;
 
+    /**
+     * Exception to override.
+     *
+     * @var TestException $exceptionToOverride
+     */
     protected Throwable $exceptionToOverride;
 
+    /**
+     * @inheritDoc
+     */
     public function __construct(?string $name = null, array $data = [], $dataName = '')
     {
         parent::__construct($name, $data, $dataName);
@@ -32,7 +66,9 @@ class ExceptionSubscriberTest extends TestCase
         $this->dataProvider = new ExceptionSubscriberDataProvider();
     }
 
-
+    /**
+     * @inheritDoc
+     */
     protected function setUp(): void
     {
         $this->subscriber = new ExceptionEventSubscriber($this->expectedException, $this->exceptionToOverride);
@@ -44,6 +80,13 @@ class ExceptionSubscriberTest extends TestCase
         $dispatcher->addSubscriber($this->subscriber);
     }
 
+    /**
+     * Tests whether the event dispatches correctly.
+     *
+     * @throws CommandNotFoundException
+     *
+     * @throws Throwable
+     */
     public function testEventExecution(): void
     {
         $this->expectException(TestException::class);
@@ -55,6 +98,13 @@ class ExceptionSubscriberTest extends TestCase
         self::assertTrue($isExecuted);
     }
 
+    /**
+     * Tests whether correct event data provides to the subscriber.
+     *
+     * @throws CommandNotFoundException
+     *
+     * @throws Throwable
+     */
     public function testExceptionSame(): void
     {
         $this->expectException(TestException::class);
@@ -66,7 +116,14 @@ class ExceptionSubscriberTest extends TestCase
         self::assertTrue($isArgumentsSame);
     }
 
-    public function testExceptionOverriding(): void
+    /**
+     * Tests whether exception overrides correctly.
+     *
+     * @throws CommandNotFoundException
+     *
+     * @throws Throwable
+     */
+    public function testExceptionRewriting(): void
     {
         $this->expectException(TestException::class);
 

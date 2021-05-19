@@ -3,21 +3,43 @@
 namespace Consolly\Tests\Unit\Event\Source;
 
 use Consolly\Consolly;
+use Consolly\Source\SourceEvents;
 use Consolly\Tests\Command\TestCommand;
 use Consolly\Tests\DataProvider\Event\Source\ArgumentsSubscriberDataProvider;
 use Consolly\Tests\Subscriber\Source\ArgumentsEventSubscriber;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Class ArgumentsSubscriberTest represents test for {@link SourceEvents::ARGUMENTS} event.
+ *
+ * @package Consolly\Tests\Unit\Event\Source
+ */
 class ArgumentsSubscriberTest extends TestCase
 {
-    protected Consolly $consolly;
-
+    /**
+     * Data provider for the subscriber.
+     *
+     * @var ArgumentsSubscriberDataProvider $dataProvider
+     */
     protected ArgumentsSubscriberDataProvider $dataProvider;
 
+    /**
+     * The subscriber which listens the event.
+     *
+     * @var ArgumentsEventSubscriber $subscriber
+     */
     protected ArgumentsEventSubscriber $subscriber;
 
+    /**
+     * Test command which options will be used for testing.
+     *
+     * @var TestCommand $command
+     */
     protected TestCommand $command;
 
+    /**
+     * @inheritDoc
+     */
     public function __construct(?string $name = null, array $data = [], $dataName = '')
     {
         parent::__construct($name, $data, $dataName);
@@ -27,7 +49,9 @@ class ArgumentsSubscriberTest extends TestCase
         $this->dataProvider = new ArgumentsSubscriberDataProvider($this->command, 'value');
     }
 
-
+    /**
+     * @inheritDoc
+     */
     protected function setUp(): void
     {
         $this->subscriber = new ArgumentsEventSubscriber(
@@ -35,20 +59,20 @@ class ArgumentsSubscriberTest extends TestCase
             $this->dataProvider->getArgumentsToOverride()
         );
 
-        $this->consolly = Consolly::default($this->dataProvider->getExceptedArguments());
+        $consolly = Consolly::default($this->dataProvider->getExceptedArguments());
 
-        $dispatcher = $this->consolly->getDispatcher();
+        $dispatcher = $consolly->getDispatcher();
 
         $dispatcher->addSubscriber($this->subscriber);
+
+        $consolly->addCommand($this->command);
+
+        $consolly->handle();
     }
 
-    protected function assertPreConditions(): void
-    {
-        $this->consolly->addCommand($this->command);
-
-        $this->consolly->handle();
-    }
-
+    /**
+     * Tests whether the event dispatches correctly.
+     */
     public function testEventExecution(): void
     {
         $isExecuted = $this->subscriber->isExecuted();
@@ -56,6 +80,9 @@ class ArgumentsSubscriberTest extends TestCase
         self::assertTrue($isExecuted);
     }
 
+    /**
+     * Tests whether correct event data provides to the subscriber.
+     */
     public function testArgumentsSame(): void
     {
         $isArgumentsSame = $this->subscriber->isSuccessful();
@@ -63,7 +90,10 @@ class ArgumentsSubscriberTest extends TestCase
         self::assertTrue($isArgumentsSame);
     }
 
-    public function testArgumentsOverriding(): void
+    /**
+     * Tests whether arguments rewrites correctly.
+     */
+    public function testArgumentsRewriting(): void
     {
         $isOverwritten = $this->command->getThird()->isIndicated();
 

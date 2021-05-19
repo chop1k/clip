@@ -8,8 +8,19 @@ use Consolly\Event\Distributor\CommandNotFoundEvent;
 use Consolly\Tests\Subscriber\TestEventSubscriber;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Class CommandNotFoundEventSubscriber represents event subscriber
+ * used for {@link DistributorEvents::COMMAND_NOT_FOUND} testing.
+ *
+ * @package Consolly\Tests\Subscriber\Distributor
+ */
 class CommandNotFoundEventSubscriber extends TestEventSubscriber implements EventSubscriberInterface
 {
+    /**
+     * CommandNotFoundEventSubscriber constructor.
+     *
+     * @param CommandInterface $command
+     */
     public function __construct(protected CommandInterface $command)
     {
         parent::__construct();
@@ -25,6 +36,11 @@ class CommandNotFoundEventSubscriber extends TestEventSubscriber implements Even
         ];
     }
 
+    /**
+     * {@link DistributorEvents::COMMAND_NOT_FOUND} event handler.
+     *
+     * @param CommandNotFoundEvent $event
+     */
     public function onCommandNotFound(CommandNotFoundEvent $event): void
     {
         $this->setExecuted(true);

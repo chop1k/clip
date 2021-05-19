@@ -2,21 +2,30 @@
 
 namespace Consolly\Tests\Unit;
 
-use Consolly\Command\CommandInterface;
 use Consolly\Consolly;
 use Consolly\Exception\CommandNotFoundException;
+use Consolly\Tests\Command\DefaultTestCommand;
 use Consolly\Tests\DataProvider\ConsollyDataProvider;
 use PHPUnit\Framework\TestCase;
+use Throwable;
 
 /**
  * Class ConsollyTest represents test for {@link Consolly} class.
  *
- * @package Consolly\Tests
+ * @package Consolly\Tests\Unit
  */
 class ConsollyTest extends TestCase
 {
+    /**
+     * Data provider for the test.
+     *
+     * @var ConsollyDataProvider $dataProvider
+     */
     protected ConsollyDataProvider $dataProvider;
 
+    /**
+     * @inheritDoc
+     */
     public function __construct(?string $name = null, array $data = [], $dataName = '')
     {
         parent::__construct($name, $data, $dataName);
@@ -27,7 +36,7 @@ class ConsollyTest extends TestCase
     /**
      * Returns dataset for testDefaultCommand test.
      *
-     * @return array[]
+     * @return string[][][]
      */
     public function getDefaultCommandArguments(): array
     {
@@ -41,17 +50,22 @@ class ConsollyTest extends TestCase
      *
      * @param array $arguments
      *
-     * @param CommandInterface|null $defaultCommand
-     *
-     * @throws CommandNotFoundException
+     * @throws CommandNotFoundException|Throwable
      */
-    public function testDefaultCommand(array $arguments, ?CommandInterface $defaultCommand): void
+    public function testDefaultCommand(array $arguments): void
     {
-        $commandExecuted = Consolly::default($arguments, $defaultCommand)->handle();
+        $commandExecuted = Consolly::default($arguments, new DefaultTestCommand())->handle();
 
         self::assertTrue($commandExecuted);
     }
 
+    /**
+     * Tests whether the exception throws when no command found.
+     *
+     * @throws CommandNotFoundException
+     *
+     * @throws Throwable
+     */
     public function testCommandNotFound(): void
     {
         $this->expectException(CommandNotFoundException::class);
