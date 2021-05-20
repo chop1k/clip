@@ -4,9 +4,6 @@ namespace Consolly\Tests\Command;
 
 use Consolly\Command\Command;
 use Consolly\Option\Option;
-use Consolly\Tests\Option\FirstTestOption;
-use Consolly\Tests\Option\SecondTestOption;
-use Consolly\Tests\Option\ThirdTestOption;
 
 /**
  * Class TestCommand represents class for testing distributors functionality.
@@ -18,23 +15,23 @@ class TestCommand extends Command
     /**
      * Contains first option.
      *
-     * @var FirstTestOption $first
+     * @var Option $first
      */
-    protected FirstTestOption $first;
+    protected Option $first;
 
     /**
      * Contains second option.
      *
-     * @var SecondTestOption $second
+     * @var Option $second
      */
-    protected SecondTestOption $second;
+    protected Option $second;
 
     /**
      * Contains third option.
      *
-     * @var ThirdTestOption $third
+     * @var Option $third
      */
-    protected ThirdTestOption $third;
+    protected Option $third;
 
     /**
      * Contains next arguments.
@@ -44,14 +41,27 @@ class TestCommand extends Command
     protected array $nextArguments;
 
     /**
+     * Determines if the command is executed.
+     *
+     * @var bool $executed
+     */
+    protected bool $executed;
+
+    /**
      * TestCommand constructor.
      */
     public function __construct()
     {
         $this->name = 'test';
-        $this->first = new FirstTestOption();
-        $this->second = new SecondTestOption();
-        $this->third = new ThirdTestOption();
+
+        $this->aliases = ['testCommand', 'testAlias'];
+
+        $this->first = new Option('first', 'f', false, false, false, false);
+        $this->second = new Option('second', 's', false, false, false, false);
+        $this->third = new Option('third', 't', false, false, false, false);
+
+        $this->nextArguments = [];
+        $this->executed = false;
 
         $this->options = [
             $this->first,
@@ -71,9 +81,9 @@ class TestCommand extends Command
     /**
      * Returns the first option.
      *
-     * @return FirstTestOption
+     * @return Option
      */
-    public function getFirst(): FirstTestOption
+    public function getFirst(): Option
     {
         return $this->first;
     }
@@ -81,9 +91,9 @@ class TestCommand extends Command
     /**
      * Returns the second option.
      *
-     * @return SecondTestOption
+     * @return Option
      */
-    public function getSecond(): SecondTestOption
+    public function getSecond(): Option
     {
         return $this->second;
     }
@@ -91,9 +101,9 @@ class TestCommand extends Command
     /**
      * Returns the third option.
      *
-     * @return ThirdTestOption
+     * @return Option
      */
-    public function getThird(): ThirdTestOption
+    public function getThird(): Option
     {
         return $this->third;
     }
@@ -117,36 +127,31 @@ class TestCommand extends Command
     }
 
     /**
-     * Checks if the properties of an option match.
-     *
-     * @param Option $option
+     * Returns true if the command handle method is executed.
      *
      * @return bool
      */
-    protected function checkOption(Option $option): bool
+    public function isExecuted(): bool
     {
-        $value = true;
+        return $this->executed;
+    }
 
-        if ($option->isRequired() && !$option->isIndicated()) {
-            $value = false;
-        }
-
-        if (($option->isRequiresValue() && $option->isIndicated()) && $option->getValue() !== $this->name) {
-            $value = false;
-        }
-
-        return $value;
+    /**
+     * Sets whether the command handle method is executed.
+     *
+     * @param bool $executed
+     */
+    public function setExecuted(bool $executed): void
+    {
+        $this->executed = $executed;
     }
 
     /**
      * @inheritdoc
      */
-    public function handle(array $nextArgs): bool
+    public function handle(array $nextArgs): void
     {
+        $this->executed = true;
         $this->nextArguments = $nextArgs;
-
-        return $this->checkOption($this->first)
-            && $this->checkOption($this->second)
-            && $this->checkOption($this->third);
     }
 }

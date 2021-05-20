@@ -39,7 +39,7 @@ class Option implements OptionInterface
      *
      * @var mixed $value
      */
-    protected $value;
+    protected mixed $value;
 
     /**
      * Contains bool which indicates whether option required.
@@ -54,6 +54,37 @@ class Option implements OptionInterface
      * @var bool $indicated
      */
     protected bool $indicated;
+
+    /**
+     * Option constructor.
+     *
+     * @param string $name
+     *
+     * @param string|null $abbreviation
+     *
+     * @param bool $required
+     *
+     * @param bool $requiresValue
+     *
+     * @param mixed|null $value
+     *
+     * @param bool $indicated
+     */
+    public function __construct(
+        string $name,
+        ?string $abbreviation,
+        bool $required,
+        bool $requiresValue,
+        mixed $value = null,
+        bool $indicated = false
+    ) {
+        $this->name = $name;
+        $this->abbreviation = $abbreviation;
+        $this->required = $required;
+        $this->requiresValue = $requiresValue;
+        $this->value = $value;
+        $this->indicated = $indicated;
+    }
 
     /**
      * @inheritdoc
@@ -114,7 +145,7 @@ class Option implements OptionInterface
      *
      * @return mixed
      */
-    public function getValue()
+    public function getValue(): mixed
     {
         return $this->value;
     }
@@ -122,7 +153,7 @@ class Option implements OptionInterface
     /**
      * @inheritdoc
      */
-    public function setValue($value): void
+    public function setValue(mixed $value): void
     {
         $this->value = $value;
     }

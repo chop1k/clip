@@ -56,6 +56,11 @@ class MyCommand implements CommandInterface
         return 'my-command';
     }
     
+    public function getAliases(): array
+    {
+        return [];
+    }
+    
     public function getOptions(): array
     {
         return []; // Using an options with a commands will be shown later.
@@ -73,6 +78,7 @@ class MyCommand implements CommandInterface
 
 CommandInterface defines methods:
 - getName() - Must return the command name.
+- getAliases() - Must return the aliases.
 - getOptions() - Must return an array of options.
 - handle() - Method which will be executed if the command specified.
 
@@ -94,12 +100,7 @@ class MyOption extends Option
 {
     public function __construct()
     {
-        $this->name = 'my-option';
-        $this->abbreviation = 'o';
-        $this->requiresValue = false;
-        $this->required = false;
-        $this->value = false;
-        $this->indicated = false;
+        parent::__construct('my-option', 'o', false, false, false, false);
     }
 }
 ```
@@ -112,6 +113,14 @@ Option class have predefined variables:
 - indicated - Indicates whether the option was specified.
 
 Of course, you can override Option class as you want.
+
+You don't have to create a new class for every option, you can use the option class and pass all settings to the constructor.
+
+```php
+use Consolly\Option\Option;
+
+$option = new Option('my-option', 'o', false, false, false, false);
+```
 
 ### Creating option via OptionInterface
 If you want a pure option class with no predefined logic, you can implement OptionInterface interface.
@@ -187,14 +196,32 @@ $consolly = new Consolly(
     new MyDefaultCommand()
 );
 
-// Or you can use preset.
-$consolly = Consolly::default([], new MyDefaultClass());
-
-// you also can use accessors to set default command.
-
 $consolly->addCommand(new MyCommand());
 
 $result = $consolly->handle();
+```
+
+Or you can use preset.
+
+```php
+use Consolly\Consolly;
+
+$consolly = Consolly::default($argv, new MyDefaultCommand());
+
+$consolly->addCommand(new MyCommand());
+```
+
+Or you can use the builder.
+
+```php
+use Consolly\ConsollyBuilder;
+
+$builder = new ConsollyBuilder();
+
+$builder
+    ->withCommand(new MyCommand())
+    ->withDefaultCommand(new MyDefaultCommand())
+->build($argv)->handle();
 ```
 
 By the way, you can create consolly class in the handle() method of the command, using the $nextArgs as console arguments.

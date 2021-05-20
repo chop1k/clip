@@ -19,9 +19,16 @@ interface CommandInterface
     public function getName(): string;
 
     /**
+     * Returns array of aliases.
+     *
+     * @return string[]
+     */
+    public function getAliases(): array;
+
+    /**
      * Returns array of command options, each option must be {@link OptionInterface} instance.
      *
-     * @return array
+     * @return OptionInterface[]
      */
     public function getOptions(): array;
 

@@ -1,12 +1,21 @@
 <?php
 
-namespace Consolly\Tests\Helper;
+namespace Consolly\Tests\DataProvider\Helper;
 
-use Consolly\Helper\Argument;
-use PHPUnit\Framework\TestCase;
+use Consolly\Tests\Unit\Helper\ArgumentTest;
 
-class ArgumentTest extends TestCase
+/**
+ * Class ArgumentDataProvider represents data provider for {@link ArgumentTest} test.
+ *
+ * @package Consolly\Tests\DataProvider\Helper
+ */
+class ArgumentDataProvider
 {
+    /**
+     * Returns data for {@link ArgumentTest::testClear()} test.
+     *
+     * @return string[][]
+     */
     public function getClearArguments(): array
     {
         return [
@@ -41,16 +50,10 @@ class ArgumentTest extends TestCase
     }
 
     /**
-     * @dataProvider getClearArguments
+     * Returns data for {@link ArgumentTest::testExplodeEqualSeparatedOption()} test.
      *
-     * @param string $input
-     * @param string $output
+     * @return array[]
      */
-    public function testClear(string $input, string $output): void
-    {
-        self::assertEquals($output, Argument::clear($input));
-    }
-
     public function getExplodeEqualSeparatedOptionArguments(): array
     {
         return [
@@ -76,16 +79,10 @@ class ArgumentTest extends TestCase
     }
 
     /**
-     * @dataProvider getExplodeEqualSeparatedOptionArguments
+     * Returns data for {@link ArgumentTest::testIsOption()} test.
      *
-     * @param string $input
-     * @param array $output
+     * @return array[]
      */
-    public function testExplodeEqualSeparatedOption(string $input, array $output): void
-    {
-        self::assertEquals($output, Argument::explodeEqualSeparated($input));
-    }
-
     public function getIsOptionArguments(): array
     {
         return [
@@ -120,16 +117,10 @@ class ArgumentTest extends TestCase
     }
 
     /**
-     * @dataProvider getIsOptionArguments
+     * Returns data for {@link ArgumentTest::testIsAbbreviation()} test.
      *
-     * @param string $input
-     * @param bool $output
+     * @return array[]
      */
-    public function testIsOption(string $input, bool $output): void
-    {
-        self::assertEquals($output, Argument::isOption($input));
-    }
-
     public function getIsAbbreviationArguments(): array
     {
         return [
@@ -164,16 +155,10 @@ class ArgumentTest extends TestCase
     }
 
     /**
-     * @dataProvider getIsAbbreviationArguments
+     * Returns data for {@link ArgumentTest::testIsAbbreviations()} test.
      *
-     * @param string $input
-     * @param bool $output
+     * @return array[]
      */
-    public function testIsAbbreviation(string $input, bool $output): void
-    {
-        self::assertEquals($output, Argument::isAbbreviation($input));
-    }
-
     public function getIsAbbreviationsArguments(): array
     {
         return [
@@ -208,16 +193,10 @@ class ArgumentTest extends TestCase
     }
 
     /**
-     * @dataProvider getIsAbbreviationsArguments
+     * Returns data for {@link ArgumentTest::testIsValue()} test.
      *
-     * @param string $input
-     * @param bool $output
+     * @return array[]
      */
-    public function testIsAbbreviations(string $input, bool $output): void
-    {
-        self::assertEquals($output, Argument::isAbbreviations($input));
-    }
-
     public function getIsValueArguments(): array
     {
         return [
@@ -252,16 +231,10 @@ class ArgumentTest extends TestCase
     }
 
     /**
-     * @dataProvider getIsValueArguments
+     * Returns data for {@link ArgumentTest::testIsPureValue()} test.
      *
-     * @param string $input
-     * @param bool $output
+     * @return array[]
      */
-    public function testIsValue(string $input, bool $output): void
-    {
-        self::assertEquals($output, Argument::isValue($input));
-    }
-
     public function getIsPureValueArguments(): array
     {
         return [
@@ -296,16 +269,10 @@ class ArgumentTest extends TestCase
     }
 
     /**
-     * @dataProvider getIsPureValueArguments
+     * Returns data for {@link ArgumentTest::testToOption()} test.
      *
-     * @param string $input
-     * @param bool $output
+     * @return string[][]
      */
-    public function testIsPureValue(string $input, bool $output): void
-    {
-        self::assertEquals($output, Argument::isPureValue($input));
-    }
-
     public function getToOptionArguments(): array
     {
         return [
@@ -316,16 +283,10 @@ class ArgumentTest extends TestCase
     }
 
     /**
-     * @dataProvider getToOptionArguments
+     * Returns data for {@link ArgumentTest::testToAbbreviation()} test.
      *
-     * @param string $input
-     * @param string $output
+     * @return string[][]
      */
-    public function testToOption(string $input, string $output): void
-    {
-        self::assertEquals($output, Argument::toOption($input));
-    }
-
     public function getToAbbreviationArguments(): array
     {
         return [
@@ -339,16 +300,10 @@ class ArgumentTest extends TestCase
     }
 
     /**
-     * @dataProvider getToAbbreviationArguments
+     * Returns data for {@link ArgumentTest::testToEqualSeparated()} test.
      *
-     * @param string $input
-     * @param string $output
+     * @return string[][]
      */
-    public function testToAbbreviation(string $input, string $output): void
-    {
-        self::assertEquals($output, Argument::toAbbreviation($input));
-    }
-
     public function getToEqualSeparatedArguments(): array
     {
         return [
@@ -368,17 +323,10 @@ class ArgumentTest extends TestCase
     }
 
     /**
-     * @dataProvider getToEqualSeparatedArguments
+     * Returns data for {@link ArgumentTest::testToValue()} test.
      *
-     * @param string $option
-     * @param string $value
-     * @param string $output
+     * @return string[][]
      */
-    public function testToEqualSeparated(string $option, string $value, string $output): void
-    {
-        self::assertEquals($output, Argument::toEqualSeparated($option, $value));
-    }
-
     public function getToValueArguments(): array
     {
         return [
@@ -395,16 +343,10 @@ class ArgumentTest extends TestCase
     }
 
     /**
-     * @dataProvider getToValueArguments
+     * Returns data for {@link ArgumentTest::testToPureValue()} test.
      *
-     * @param string $input
-     * @param string $output
+     * @return string[][]
      */
-    public function testToValueArguments(string $input, string $output): void
-    {
-        self::assertEquals($output, Argument::toValue($input));
-    }
-
     public function getToPureValueArguments(): array
     {
         return [
@@ -418,16 +360,5 @@ class ArgumentTest extends TestCase
                 "'value'", 'value'
             ]
         ];
-    }
-
-    /**
-     * @dataProvider getToPureValueArguments
-     *
-     * @param string $input
-     * @param string $output
-     */
-    public function testToPureValue(string $input, string $output): void
-    {
-        self::assertEquals($output, Argument::toPureValue($input));
     }
 }

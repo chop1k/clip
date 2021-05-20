@@ -20,14 +20,14 @@ class Distributor implements DistributorInterface
     /**
      * Contains an array of commands.
      *
-     * @var array $commands
+     * @var CommandInterface[] $commands
      */
     protected array $commands;
 
     /**
      * Contains an array of the arguments.
      *
-     * @var array $arguments
+     * @var string[] $arguments
      */
     protected array $arguments;
 
@@ -67,19 +67,20 @@ class Distributor implements DistributorInterface
     /**
      * Iterates through an array of commands and returns an array whose keys are the command name.
      *
-     * @param array $commands
+     * @param CommandInterface[] $commands
      *
-     * @return array
+     * @return CommandInterface[]
      */
     protected function handleCommands(array $commands): array
     {
         $handledCommands = [];
 
-        /**
-         * @var CommandInterface $command
-         */
         foreach ($commands as $command) {
             $handledCommands[$command->getName()] = $command;
+
+            foreach ($command->getAliases() as $alias) {
+                $handledCommands[$alias] = $command;
+            }
         }
 
         return $handledCommands;
@@ -151,9 +152,6 @@ class Distributor implements DistributorInterface
         $commandOptions = [];
         $requiredOptionsNumber = 0;
 
-        /**
-         * @var OptionInterface $option
-         */
         foreach ($command->getOptions() as $option) {
             $name = $this->formatter->format($option->getName(), Argument::TYPE_OPTION);
 
@@ -206,9 +204,9 @@ class Distributor implements DistributorInterface
      *
      * @param string $argument
      *
-     * @param array $options
+     * @param string[] $options
      *
-     * @param array $values
+     * @param string[] $values
      */
     protected function handleArgument(string $argument, array &$options, array &$values): void
     {
@@ -245,7 +243,7 @@ class Distributor implements DistributorInterface
      *
      * @param string $type
      *
-     * @param array $options
+     * @param string[] $options
      */
     protected function handleOption(string $option, string $type, array &$options): void
     {
@@ -263,7 +261,7 @@ class Distributor implements DistributorInterface
      *
      * @param string $value
      *
-     * @param array $values
+     * @param string[] $values
      */
     protected function handleValue(string $value, array &$values): void
     {
@@ -299,11 +297,11 @@ class Distributor implements DistributorInterface
     /**
      * Distributes given options and values.
      *
-     * @param array $options
+     * @param string[] $options
      *
-     * @param array $values
+     * @param string[] $values
      *
-     * @param array $commandOptions
+     * @param OptionInterface[] $commandOptions
      *
      * @param int $requiredOptionsNumber
      *

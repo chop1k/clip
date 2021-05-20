@@ -5,7 +5,7 @@
   "keywords": ["console", "cli", "framework", "package", "tools"],
   "minimum-stability": "stable",
   "license": "MIT",
-  "version": "v2.1.1",
+  "version": "v2.2.0",
   "authors": [
     {
       "name": "chop1k",
@@ -13,11 +13,12 @@
     }
   ],
   "require": {
-    "php": "^7.4"
+    "php": "^8.0",
+    "symfony/event-dispatcher": "v5.2.4"
   },
   "require-dev": {
-    "squizlabs/php_codesniffer": "3.5.8",
-    "phpunit/phpunit": "9.3.8"
+    "squizlabs/php_codesniffer": "3.6.0",
+    "phpunit/phpunit": "9.5.4"
   },
   "autoload": {
     "psr-4": {
