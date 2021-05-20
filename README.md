@@ -2,13 +2,14 @@
 Package for console scripts and applications.
 
 ## Requirements
-- PHP 7.4
+- PHP 8.0
 
 ## Documentation
 - [Basic usage](docs/basic_usage.md)
 - [Source](docs/source.md)
 - [Distributor](docs/distributor.md)
 - [Formatter](docs/formatter.md)
+- [Events](docs/events.md)
 - [Argument](docs/argument.md)
 - [Changelog](docs/changelog.md)
 

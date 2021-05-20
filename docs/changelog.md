@@ -1,6 +1,15 @@
 # Changelog
 Here is a list of versions with changes from first to last.
 
+## v2.2.0
+- Migrated to PHP 8.0 and phpunit 9.5.4.
+- Added [lifecycle events](events.md).
+- Tests refactored.
+  - Unit tests are now located in the /Unit namespace.
+  - Tests are now more readable.
+  - DataProviders moved to separate classes.
+- Added ConsollyBuilder with tests.
+
 ## v2.1.1
 - Fixed bug where all arguments were ignored when using the default command.
 
